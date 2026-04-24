@@ -4,38 +4,42 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 6%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 6%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 6%;
-    --primary: 0 0% 6%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 6%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 153 100% 43%;
-    --accent-foreground: 0 0% 6%;
+    --background: 36 33% 97%;
+    --foreground: 24 20% 18%;
+    --card: 36 30% 98%;
+    --card-foreground: 24 20% 18%;
+    --popover: 36 30% 98%;
+    --popover-foreground: 24 20% 18%;
+    --primary: 18 55% 38%;
+    --primary-foreground: 36 50% 97%;
+    --secondary: 36 25% 93%;
+    --secondary-foreground: 24 20% 18%;
+    --muted: 36 20% 93%;
+    --muted-foreground: 24 12% 50%;
+    --accent: 18 55% 38%;
+    --accent-foreground: 36 50% 97%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 92%;
-    --input: 0 0% 92%;
-    --ring: 153 100% 43%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 20%;
-    --sidebar-primary: 0 0% 6%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 95%;
-    --sidebar-accent-foreground: 0 0% 6%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 153 100% 43%;
+    --border: 36 20% 88%;
+    --input: 36 20% 88%;
+    --ring: 18 55% 38%;
+    --radius: 1rem;
+    --sidebar-background: 36 30% 96%;
+    --sidebar-foreground: 24 20% 18%;
+    --sidebar-primary: 18 55% 38%;
+    --sidebar-primary-foreground: 36 50% 97%;
+    --sidebar-accent: 36 25% 93%;
+    --sidebar-accent-foreground: 24 20% 18%;
+    --sidebar-border: 36 20% 88%;
+    --sidebar-ring: 18 55% 38%;
 
-    --neon: #00dc82;
-    --neon-dim: rgba(0, 220, 130, 0.1);
-    --neon-border: rgba(0, 220, 130, 0.3);
+    --cream: #faf6f0;
+    --warm: #f5ede0;
+    --terra: #a0522d;
+    --terra-light: rgba(160, 82, 45, 0.1);
+    --terra-border: rgba(160, 82, 45, 0.2);
+    --text: #2e2218;
+    --muted-text: #8c7b6e;
   }
 }
 
@@ -44,66 +48,92 @@
     @apply border-border;
   }
   body {
-    @apply bg-white text-gray-900;
+    background: var(--cream);
+    color: var(--text);
     font-family: "Golos Text", sans-serif;
   }
 }
 
-.btn-primary {
-  background: #111;
+.font-handwritten {
+  font-family: "Caveat", cursive;
+}
+
+/* Card */
+.cozy-card {
+  background: #fff;
+  border: 1px solid rgba(160, 82, 45, 0.12);
+  border-radius: 20px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.cozy-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(160, 82, 45, 0.1);
+}
+
+/* Primary button */
+.btn-warm {
+  background: var(--terra);
   color: #fff;
+  border-radius: 50px;
   transition:
     background 0.15s ease,
-    box-shadow 0.15s ease;
+    box-shadow 0.2s ease;
 }
-.btn-primary:hover {
-  background: #000;
-  box-shadow: 0 0 0 3px var(--neon-border);
+.btn-warm:hover {
+  background: #8b4522;
+  box-shadow: 0 4px 20px rgba(160, 82, 45, 0.35);
 }
 
-.btn-neon-outline {
+/* Outline button */
+.btn-outline-warm {
   background: transparent;
-  color: var(--neon);
-  border: 1px solid var(--neon-border);
+  color: var(--terra);
+  border: 1.5px solid var(--terra-border);
+  border-radius: 50px;
   transition: background 0.15s ease;
 }
-.btn-neon-outline:hover {
-  background: var(--neon-dim);
+.btn-outline-warm:hover {
+  background: var(--terra-light);
 }
 
-.card-hover {
-  transition:
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
-}
-.card-hover:hover {
-  border-color: var(--neon-border);
-  box-shadow:
-    0 0 0 1px var(--neon-border),
-    0 8px 32px rgba(0, 0, 0, 0.06);
-}
-
-.tag-neon {
-  background: var(--neon-dim);
-  color: var(--neon);
-  border: 1px solid var(--neon-border);
+/* Tag */
+.tag-warm {
+  background: var(--terra-light);
+  color: var(--terra);
+  border: 1px solid var(--terra-border);
+  border-radius: 50px;
   font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-weight: 600;
+  padding: 3px 10px;
   display: inline-block;
 }
 
+/* Nav */
 .nav-active {
-  color: #0f0f0f;
-  border-bottom: 2px solid var(--neon);
+  color: var(--terra);
+  font-weight: 700;
 }
 
+/* Category pill hover */
+.pill-hover {
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.15s;
+}
+.pill-hover:hover {
+  background: var(--warm);
+  border-color: var(--terra-border);
+  transform: scale(1.03);
+}
+
+/* Fade in */
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -111,25 +141,22 @@
   }
 }
 .animate-fade-up {
-  animation: fade-up 0.4s ease forwards;
+  animation: fade-up 0.5s ease forwards;
 }
 .animate-delay-1 {
-  animation-delay: 0.1s;
+  animation-delay: 0.15s;
   opacity: 0;
 }
 .animate-delay-2 {
-  animation-delay: 0.2s;
-  opacity: 0;
-}
-.animate-delay-3 {
   animation-delay: 0.3s;
   opacity: 0;
 }
 
+/* Chat */
 @keyframes bounce-in {
   0% {
     opacity: 0;
-    transform: scale(0.85) translateY(10px);
+    transform: scale(0.88) translateY(12px);
   }
   100% {
     opacity: 1;
@@ -140,40 +167,37 @@
   animation: bounce-in 0.25s ease forwards;
 }
 
-@keyframes ticker {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-.ticker-inner {
-  display: flex;
-  width: max-content;
-  animation: ticker 22s linear infinite;
+/* Wavy divider */
+.wavy-top {
+  background: var(--cream);
+  border-radius: 50% 50% 0 0 / 20px 20px 0 0;
 }
 
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #fafafa;
+  background: var(--warm);
 }
 ::-webkit-scrollbar-thumb {
-  background: #e0e0e0;
-  border-radius: 2px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--neon);
+  background: var(--terra-border);
+  border-radius: 10px;
 }
 
-.tooltip-wrap:hover .tooltip-box {
-  opacity: 1;
-  pointer-events: auto;
+/* Sticker label */
+.sticker {
+  background: var(--terra);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  letter-spacing: 0.03em;
 }
-.tooltip-box {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
+.sticker-green {
+  background: #4a7c59;
+}
+.sticker-amber {
+  background: #b07d3a;
 }
