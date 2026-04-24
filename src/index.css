@@ -4,42 +4,42 @@
 
 @layer base {
   :root {
-    --background: 36 33% 97%;
-    --foreground: 24 20% 18%;
-    --card: 36 30% 98%;
-    --card-foreground: 24 20% 18%;
-    --popover: 36 30% 98%;
-    --popover-foreground: 24 20% 18%;
-    --primary: 18 55% 38%;
-    --primary-foreground: 36 50% 97%;
-    --secondary: 36 25% 93%;
-    --secondary-foreground: 24 20% 18%;
-    --muted: 36 20% 93%;
-    --muted-foreground: 24 12% 50%;
-    --accent: 18 55% 38%;
-    --accent-foreground: 36 50% 97%;
+    --background: 220 15% 8%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 10%;
+    --primary: 24 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 14%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 220 15% 14%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 24 100% 50%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 36 20% 88%;
-    --input: 36 20% 88%;
-    --ring: 18 55% 38%;
-    --radius: 1rem;
-    --sidebar-background: 36 30% 96%;
-    --sidebar-foreground: 24 20% 18%;
-    --sidebar-primary: 18 55% 38%;
-    --sidebar-primary-foreground: 36 50% 97%;
-    --sidebar-accent: 36 25% 93%;
-    --sidebar-accent-foreground: 24 20% 18%;
-    --sidebar-border: 36 20% 88%;
-    --sidebar-ring: 18 55% 38%;
+    --border: 220 15% 20%;
+    --input: 220 15% 20%;
+    --ring: 24 100% 50%;
+    --radius: 0.75rem;
+    --sidebar-background: 220 15% 10%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 24 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 16%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 220 15% 20%;
+    --sidebar-ring: 24 100% 50%;
 
-    --cream: #faf6f0;
-    --warm: #f5ede0;
-    --terra: #a0522d;
-    --terra-light: rgba(160, 82, 45, 0.1);
-    --terra-border: rgba(160, 82, 45, 0.2);
-    --text: #2e2218;
-    --muted-text: #8c7b6e;
+    --orange: #ff6600;
+    --orange-glow: rgba(255, 102, 0, 0.45);
+    --neon-blue: #00bfff;
+    --neon-blue-glow: rgba(0, 191, 255, 0.4);
+    --neon-pink: #ff2d78;
+    --glass: rgba(255, 255, 255, 0.07);
+    --glass-border: rgba(255, 255, 255, 0.12);
   }
 }
 
@@ -48,92 +48,137 @@
     @apply border-border;
   }
   body {
-    background: var(--cream);
-    color: var(--text);
+    @apply bg-background text-foreground;
     font-family: "Golos Text", sans-serif;
   }
 }
 
-.font-handwritten {
-  font-family: "Caveat", cursive;
+/* Neon text glow */
+.neon-blue {
+  color: var(--neon-blue);
+  text-shadow:
+    0 0 10px var(--neon-blue-glow),
+    0 0 30px var(--neon-blue-glow),
+    0 0 60px rgba(0, 191, 255, 0.2);
 }
-
-/* Card */
-.cozy-card {
-  background: #fff;
-  border: 1px solid rgba(160, 82, 45, 0.12);
-  border-radius: 20px;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+.neon-orange {
+  color: var(--orange);
+  text-shadow:
+    0 0 10px var(--orange-glow),
+    0 0 30px var(--orange-glow);
 }
-.cozy-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 36px rgba(160, 82, 45, 0.1);
-}
-
-/* Primary button */
-.btn-warm {
-  background: var(--terra);
+.neon-white {
   color: #fff;
-  border-radius: 50px;
-  transition:
-    background 0.15s ease,
-    box-shadow 0.2s ease;
-}
-.btn-warm:hover {
-  background: #8b4522;
-  box-shadow: 0 4px 20px rgba(160, 82, 45, 0.35);
+  text-shadow:
+    0 0 20px rgba(255, 255, 255, 0.6),
+    0 0 40px rgba(255, 255, 255, 0.3);
 }
 
-/* Outline button */
-.btn-outline-warm {
-  background: transparent;
-  color: var(--terra);
-  border: 1.5px solid var(--terra-border);
-  border-radius: 50px;
-  transition: background 0.15s ease;
-}
-.btn-outline-warm:hover {
-  background: var(--terra-light);
-}
-
-/* Tag */
-.tag-warm {
-  background: var(--terra-light);
-  color: var(--terra);
-  border: 1px solid var(--terra-border);
-  border-radius: 50px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 3px 10px;
-  display: inline-block;
-}
-
-/* Nav */
-.nav-active {
-  color: var(--terra);
+/* Neon sign nav */
+.neon-sign {
   font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.2s ease;
+}
+.neon-sign:hover,
+.neon-sign-active {
+  color: var(--neon-blue);
+  text-shadow:
+    0 0 8px var(--neon-blue-glow),
+    0 0 20px var(--neon-blue-glow);
+}
+.neon-sign-active {
+  border-bottom: 2px solid var(--neon-blue);
 }
 
-/* Category pill hover */
-.pill-hover {
+/* Glass panel */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Orange CTA button */
+.btn-orange {
+  background: var(--orange);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px;
   transition:
-    background 0.15s,
-    border-color 0.15s,
-    transform 0.15s;
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
+    background 0.15s;
 }
-.pill-hover:hover {
-  background: var(--warm);
-  border-color: var(--terra-border);
-  transform: scale(1.03);
+.btn-orange:hover {
+  background: #e65c00;
+  box-shadow:
+    0 0 20px var(--orange-glow),
+    0 4px 16px rgba(255, 102, 0, 0.4);
+  transform: translateY(-1px);
 }
 
-/* Fade in */
+/* Ghost button */
+.btn-ghost {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid var(--glass-border);
+  border-radius: 8px;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.btn-ghost:hover {
+  border-color: var(--neon-blue);
+  background: rgba(0, 191, 255, 0.06);
+}
+
+/* Product card */
+.product-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+}
+.product-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 102, 0, 0.15);
+}
+
+/* Search glow */
+.search-glow:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--orange),
+    0 0 20px var(--orange-glow);
+}
+
+/* Category pill */
+.cat-pill {
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  transition: all 0.18s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cat-pill:hover,
+.cat-pill-active {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  text-shadow: 0 0 8px var(--neon-blue-glow);
+  background: rgba(0, 191, 255, 0.06);
+}
+
+/* Fade up */
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -151,6 +196,36 @@
   animation-delay: 0.3s;
   opacity: 0;
 }
+.animate-delay-3 {
+  animation-delay: 0.45s;
+  opacity: 0;
+}
+
+/* Banner text flicker */
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.8;
+  }
+  94% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 0.9;
+  }
+  97% {
+    opacity: 1;
+  }
+}
+.flicker {
+  animation: flicker 4s ease-in-out infinite;
+}
 
 /* Chat */
 @keyframes bounce-in {
@@ -167,37 +242,32 @@
   animation: bounce-in 0.25s ease forwards;
 }
 
-/* Wavy divider */
-.wavy-top {
-  background: var(--cream);
-  border-radius: 50% 50% 0 0 / 20px 20px 0 0;
-}
-
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--warm);
+  background: #0d1117;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--terra-border);
+  background: var(--orange);
   border-radius: 10px;
 }
 
-/* Sticker label */
-.sticker {
-  background: var(--terra);
+/* Badge */
+.badge-orange {
+  background: var(--orange);
   color: #fff;
-  border-radius: 50px;
-  font-size: 0.65rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 9px;
-  letter-spacing: 0.03em;
+  padding: 2px 8px;
 }
-.sticker-green {
-  background: #4a7c59;
-}
-.sticker-amber {
-  background: #b07d3a;
+.badge-blue {
+  background: var(--neon-blue);
+  color: #000;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
 }
