@@ -1,133 +1,252 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 
-const PRODUCTS = [
-  { id: 1, name: "Смартфон X-Vision 12",  price: 24900, oldPrice: 31000, rating: 4.6, reviews: 89,  badge: "−20%",    bColor: "bg-[#FFD600] text-black", emoji: "📱", cat: "Электроника" },
-  { id: 2, name: "Кроссовки Urban Pro",   price: 4990,  oldPrice: 7200,  rating: 4.8, reviews: 312, badge: "ХИТ",     bColor: "bg-[#FF5252] text-white", emoji: "👟", cat: "Обувь" },
-  { id: 3, name: "Платье Summer Glow",    price: 2490,  oldPrice: null,  rating: 4.9, reviews: 204, badge: "НОВИНКА", bColor: "bg-[#00BFA5] text-white", emoji: "👗", cat: "Одежда" },
-  { id: 4, name: "Контроллер Pro X",      price: 6200,  oldPrice: 8500,  rating: 4.7, reviews: 147, badge: "−27%",    bColor: "bg-[#FFD600] text-black", emoji: "🎮", cat: "Игры" },
-  { id: 5, name: "Сыворотка Retinol",     price: 2990,  oldPrice: 3900,  rating: 4.8, reviews: 203, badge: "ТОП",     bColor: "bg-[#FF5252] text-white", emoji: "✨", cat: "Красота" },
-  { id: 6, name: "Наушники SoundWave X3", price: 8990,  oldPrice: 12000, rating: 4.8, reviews: 376, badge: "−25%",    bColor: "bg-[#00BFA5] text-white", emoji: "🎧", cat: "Электроника" },
+/* ── Данные ── */
+const CITIES = [
+  "Москва", "Санкт-Петербург", "Казань", "Новосибирск", "Екатеринбург",
+  "Нижний Новгород", "Краснодар", "Самара", "Ростов-на-Дону", "Уфа",
+  "Пермь", "Воронеж", "Омск", "Челябинск", "Владивосток",
 ];
 
 const CATS = [
-  { name: "Электроника", emoji: "📱", count: "760",   cls: "block-yellow" },
-  { name: "Одежда",      emoji: "👗", count: "3 870", cls: "block-ink" },
-  { name: "Обувь",       emoji: "👟", count: "1 240", cls: "block-teal" },
-  { name: "Красота",     emoji: "💄", count: "1 650", cls: "block-coral" },
-  { name: "Дом",         emoji: "🏠", count: "2 100", cls: "block-white" },
-  { name: "Игры",        emoji: "🎮", count: "560",   cls: "block-ink" },
-  { name: "Детям",       emoji: "👶", count: "980",   cls: "block-yellow" },
-  { name: "Инструменты", emoji: "🔧", count: "720",   cls: "block-teal" },
+  "Все", "Дом и сад", "Красота", "Электроника", "Одежда", "Детям", "Спорт", "Еда",
 ];
 
-const NAV = [
-  { label: "Главная",    id: "home" },
-  { label: "Категории",  id: "categories" },
-  { label: "Акции",      id: "sales" },
-  { label: "Популярное", id: "popular" },
-  { label: "О нас",      id: "about" },
-  { label: "Контакты",   id: "contacts" },
+const SELLERS = [
+  { id: "s1", name: "АромаДом",    emoji: "🕯",  city: "Москва",          rating: 4.9, sales: 1240, desc: "Натуральные аромасвечи и диффузоры ручной работы" },
+  { id: "s2", name: "Beautylab",   emoji: "✨",  city: "Санкт-Петербург", rating: 4.8, sales: 890,  desc: "Профессиональный уход за кожей" },
+  { id: "s3", name: "ДомДекор",    emoji: "🏺",  city: "Казань",          rating: 4.7, sales: 654,  desc: "Декор и интерьерные аксессуары" },
+  { id: "s4", name: "КухняПро",    emoji: "☕",  city: "Москва",          rating: 4.6, sales: 2100, desc: "Посуда и товары для кухни" },
+  { id: "s5", name: "СпортМаркет", emoji: "👟",  city: "Екатеринбург",    rating: 4.9, sales: 3200, desc: "Спортивная одежда и инвентарь" },
+  { id: "s6", name: "ДетскийМир",  emoji: "🧩",  city: "Новосибирск",     rating: 4.8, sales: 760,  desc: "Игрушки и товары для детей" },
 ];
 
-const TICKER = ["⬛ Доставка за 1 день", "◆ 50 000+ товаров", "◆ Возврат 14 дней", "⬛ Продавцы со всей России", "◆ Рейтинг 4.8 / 5", "◆ Поддержка 24 / 7"];
+const PRODUCTS = [
+  { id: 1,  name: "Диффузор «Лаванда»",  price: 1490, oldPrice: 2100, rating: 4.8, reviews: 312, sellerId: "s1", badge: "−29%", cat: "Дом и сад",    emoji: "🕯" },
+  { id: 2,  name: "Крем-флюид Glow",     price: 2290, oldPrice: 3200, rating: 4.9, reviews: 521, sellerId: "s2", badge: "ТОП",  cat: "Красота",      emoji: "💆" },
+  { id: 3,  name: "Ваза Marble Grey",    price: 3490, oldPrice: 4800, rating: 4.6, reviews: 147, sellerId: "s3", badge: "−27%", cat: "Дом и сад",    emoji: "🏺" },
+  { id: 4,  name: "Термокружка Pastel",  price: 1190, oldPrice: null, rating: 4.5, reviews: 376, sellerId: "s4", badge: null,   cat: "Еда",          emoji: "☕" },
+  { id: 5,  name: "Кроссовки Urban Pro", price: 4990, oldPrice: 7200, rating: 4.8, reviews: 891, sellerId: "s5", badge: "ХИТ",  cat: "Спорт",        emoji: "👟" },
+  { id: 6,  name: "Конструктор Blocks+", price: 1890, oldPrice: null, rating: 4.7, reviews: 89,  sellerId: "s6", badge: "NEW",  cat: "Детям",        emoji: "🧩" },
+  { id: 7,  name: "Свеча «Ваниль»",      price: 890,  oldPrice: 1200, rating: 4.7, reviews: 204, sellerId: "s1", badge: "−26%", cat: "Дом и сад",    emoji: "🕯" },
+  { id: 8,  name: "Сыворотка Retinol",   price: 2990, oldPrice: 3900, rating: 4.8, reviews: 203, sellerId: "s2", badge: "−23%", cat: "Красота",      emoji: "✨" },
+  { id: 9,  name: "Органайзер Desk",     price: 1590, oldPrice: null, rating: 4.5, reviews: 67,  sellerId: "s3", badge: null,   cat: "Дом и сад",    emoji: "📦" },
+  { id: 10, name: "Смартфон X-Vision",   price: 24900,oldPrice:31000, rating: 4.6, reviews: 89,  sellerId: "s5", badge: "−20%", cat: "Электроника",  emoji: "📱" },
+  { id: 11, name: "Набор LEGO City",     price: 3290, oldPrice: null, rating: 4.9, reviews: 412, sellerId: "s6", badge: "NEW",  cat: "Детям",        emoji: "🏗" },
+  { id: 12, name: "Платье Summer Glow",  price: 2490, oldPrice: null, rating: 4.9, reviews: 204, sellerId: "s2", badge: null,   cat: "Одежда",       emoji: "👗" },
+];
 
-const CHAT_TIPS = ["Где заказ?", "Возврат", "Стать продавцом", "Рассрочка"];
-const BOT: Record<string, string> = {
-  "Где заказ?":         "Ваши заказы — Личный кабинет → «Мои заказы».",
-  "Возврат":            "Возврат в течение 14 дней через карточку заказа.",
-  "Стать продавцом":    "Регистрация бесплатна. Комиссия только с продаж.",
-  "Рассрочка":          "Рассрочка 0% от 5 000 ₽ при оформлении.",
-};
-
-interface Msg { from: "user" | "bot"; text: string; }
-
-function Stars({ r }: { r: number }) {
+/* ── Helpers ── */
+function Stars({ r, size = 12 }: { r: number; size?: number }) {
   return (
-    <span className="text-xs tracking-tight">
-      {"★".repeat(Math.round(r))}<span className="text-gray-200">{"★".repeat(5 - Math.round(r))}</span>
+    <span style={{ fontSize: size, lineHeight: 1 }}>
+      {[1,2,3,4,5].map(s => (
+        <span key={s} style={{ color: s <= Math.round(r) ? "#F59E0B" : "#D1D5DB" }}>★</span>
+      ))}
     </span>
   );
 }
 
-export default function Index() {
-  const [activeNav, setActiveNav] = useState("home");
-  const [cartCount, setCartCount] = useState(0);
-  const [cartItems, setCartItems] = useState<number[]>([]);
-  const [wishlist,  setWishlist]  = useState<number[]>([]);
-  const [search,    setSearch]    = useState("");
-  const [chatOpen,  setChatOpen]  = useState(false);
-  const [msgs, setMsgs]           = useState<Msg[]>([{ from: "bot", text: "Здравствуйте. Чем могу помочь?" }]);
-  const [input, setInput]         = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
-
-  const buy     = (id: number) => { if (!cartItems.includes(id)) { setCartItems(p => [...p, id]); setCartCount(c => c + 1); } };
-  const heart   = (id: number) => { setWishlist(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); };
-  const goTo    = (id: string) => { setActiveNav(id); document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); };
-  const send    = (t: string)  => {
-    setMsgs(p => [...p, { from: "user", text: t }]);
-    setTimeout(() => setMsgs(p => [...p, { from: "bot", text: BOT[t] ?? "Уточните вопрос — ответим быстро." }]), 450);
-    setInput("");
-  };
+/* ── City Modal ── */
+function CityModal({ onSelect }: { onSelect: (c: string) => void }) {
+  const [q, setQ] = useState("");
+  const filtered = CITIES.filter(c => c.toLowerCase().includes(q.toLowerCase()));
 
   return (
-    <div className="min-h-screen" style={{ background: "#F5F5F5", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+    <div className="modal-overlay">
+      <div className="modal-box p-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "var(--em-light)", border: "1.5px solid var(--em-border)" }}>
+            <Icon name="MapPin" size={18} style={{ color: "var(--em)" }} />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold" style={{ color: "var(--ink)" }}>Выберите ваш город</h2>
+            <p className="text-sm" style={{ color: "var(--sub)" }}>Это поможет показать актуальные предложения</p>
+          </div>
+        </div>
 
-      {/* ── TICKER ── */}
-      <div className="block-ink overflow-hidden py-2 text-xs select-none" style={{ borderBottom: "1px solid #222" }}>
-        <div className="flex w-max ticker-track gap-16">
-          {[...TICKER, ...TICKER].map((t, i) => (
-            <span key={i} className="whitespace-nowrap font-medium tracking-widest text-white/70">{t}</span>
+        <div className="relative mt-5 mb-4">
+          <input
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            placeholder="Найти город..."
+            className="search-em w-full pl-9 pr-4 py-2.5"
+            autoFocus
+          />
+          <Icon name="Search" size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--sub)" }} />
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto pr-1">
+          {filtered.map(city => (
+            <button key={city} className="city-btn" onClick={() => onSelect(city)}>
+              {city}
+            </button>
           ))}
         </div>
+
+        <p className="text-xs mt-4 text-center" style={{ color: "var(--sub)" }}>
+          Можно изменить в любой момент в шапке сайта
+        </p>
       </div>
+    </div>
+  );
+}
+
+/* ── Seller Page ── */
+function SellerPage({ sellerId, onClose }: { sellerId: string; onClose: () => void }) {
+  const seller = SELLERS.find(s => s.id === sellerId)!;
+  const goods  = PRODUCTS.filter(p => p.sellerId === sellerId);
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" style={{ maxWidth: 680 }} onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="flex items-start gap-4 p-6 border-b" style={{ borderColor: "var(--line)" }}>
+          <div className="seller-avatar text-3xl">{seller.emoji}</div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-0.5">
+              <h2 className="text-xl font-bold">{seller.name}</h2>
+              <span className="badge-em">Продавец</span>
+            </div>
+            <p className="text-sm mb-2" style={{ color: "var(--sub)" }}>{seller.desc}</p>
+            <div className="flex items-center gap-4 text-sm" style={{ color: "var(--sub)" }}>
+              <span className="flex items-center gap-1"><Icon name="MapPin" size={13} /> {seller.city}</span>
+              <span className="flex items-center gap-1"><Stars r={seller.rating} /> {seller.rating}</span>
+              <span>{seller.sales.toLocaleString("ru-RU")} продаж</span>
+            </div>
+          </div>
+          <button className="btn-ghost p-2" onClick={onClose}>
+            <Icon name="X" size={18} />
+          </button>
+        </div>
+
+        {/* Products */}
+        <div className="p-6">
+          <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--sub)" }}>ВИТРИНА · {goods.length} товаров</h3>
+          <div className="grid grid-cols-3 gap-3 max-h-72 overflow-y-auto pr-1">
+            {goods.map(p => (
+              <div key={p.id} className="p-card">
+                <div className="h-24 flex items-center justify-center text-4xl" style={{ background: "var(--bg-off)" }}>
+                  {p.emoji}
+                </div>
+                <div className="p-3">
+                  <div className="text-xs font-medium leading-tight mb-1" style={{ color: "var(--ink)" }}>{p.name}</div>
+                  <div className="font-bold text-sm" style={{ color: "var(--em)" }}>{p.price.toLocaleString("ru-RU")} ₽</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-6 pb-6">
+          <button className="btn-em w-full">Подписаться на продавца</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main ── */
+export default function Index() {
+  const [city,       setCity]       = useState<string | null>(null);
+  const [showCity,   setShowCity]   = useState(true);
+  const [activeCat,  setActiveCat]  = useState("Все");
+  const [activeNav,  setActiveNav]  = useState("home");
+  const [search,     setSearch]     = useState("");
+  const [cartItems,  setCartItems]  = useState<number[]>([]);
+  const [wishlist,   setWishlist]   = useState<number[]>([]);
+  const [sellerPage, setSellerPage] = useState<string | null>(null);
+  const [tab,        setTab]        = useState("popular");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("vseti_city");
+    if (saved) { setCity(saved); setShowCity(false); }
+  }, []);
+
+  const selectCity = (c: string) => {
+    setCity(c);
+    setShowCity(false);
+    localStorage.setItem("vseti_city", c);
+  };
+
+  const addToCart = (id: number) => {
+    if (!cartItems.includes(id)) setCartItems(p => [...p, id]);
+  };
+
+  const toggleWish = (id: number) => {
+    setWishlist(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]);
+  };
+
+  const scrollTo = (id: string) => {
+    setActiveNav(id);
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const displayed = PRODUCTS.filter(p => {
+    const catOk  = activeCat === "Все" || p.cat === activeCat;
+    const srchOk = p.name.toLowerCase().includes(search.toLowerCase());
+    return catOk && srchOk;
+  });
+
+  const seller = (id: string) => SELLERS.find(s => s.id === id)!;
+
+  return (
+    <div className="min-h-screen" style={{ background: "var(--bg)", fontFamily: "'Inter', sans-serif" }}>
+
+      {/* ── City Modal ── */}
+      {showCity && <CityModal onSelect={selectCity} />}
+
+      {/* ── Seller Modal ── */}
+      {sellerPage && <SellerPage sellerId={sellerPage} onClose={() => setSellerPage(null)} />}
 
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 bg-white" style={{ borderBottom: "3px solid #0F0F0F" }}>
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-6">
+      <header className="sticky top-0 z-40 bg-white" style={{ borderBottom: "1px solid var(--line)" }}>
+        <div className="max-w-6xl mx-auto px-5 py-3 flex items-center gap-4">
 
           {/* Logo */}
-          <div className="flex-shrink-0 mr-2">
-            <div className="display text-2xl tracking-tight" style={{ fontFamily: "Oswald, sans-serif" }}>ВСЕТИ-ГОРОДА</div>
-            <div className="text-[9px] tracking-[0.25em] font-semibold uppercase" style={{ color: "var(--mid)" }}>МАРКЕТПЛЕЙС</div>
+          <div className="flex-shrink-0">
+            <div className="font-bold text-base tracking-tight" style={{ color: "var(--ink)" }}>Всети-города</div>
           </div>
 
+          {/* City chip */}
+          {city && (
+            <button className="city-chip flex-shrink-0" onClick={() => setShowCity(true)}>
+              <Icon name="MapPin" size={14} />
+              {city}
+              <Icon name="ChevronDown" size={12} />
+            </button>
+          )}
+
           {/* Search */}
-          <div className="flex-1 max-w-lg relative">
+          <div className="flex-1 max-w-sm relative">
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="ПОИСК ТОВАРОВ..."
-              className="search-geo w-full pl-11 pr-5 py-2.5 text-sm uppercase tracking-wider"
+              placeholder="Поиск товаров..."
+              className="search-em w-full pl-9 pr-4 py-2"
             />
-            <Icon name="Search" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black" />
-            {search && (
-              <button onClick={() => setSearch("")} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">
-                <Icon name="X" size={14} />
-              </button>
-            )}
+            <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--sub)" }} />
           </div>
 
-          <div className="flex items-center gap-2 ml-auto">
-            <button className="p-2.5 hover:bg-gray-100 transition-colors" style={{ color: "var(--mid)" }}>
-              <Icon name="User" size={20} />
+          <div className="flex items-center gap-1 ml-auto">
+            <button className="btn-ghost flex items-center gap-1.5">
+              <Icon name="User" size={16} />
+              <span className="hidden sm:inline text-sm">Войти</span>
             </button>
-            <button className="relative p-2.5 hover:bg-gray-100 transition-colors" style={{ color: "var(--mid)" }}>
-              <Icon name="Heart" size={20} />
+            <button className="btn-ghost relative flex items-center gap-1.5">
+              <Icon name="Heart" size={16} />
               {wishlist.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center text-[9px] font-bold text-black" style={{ background: "var(--yellow)" }}>
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center text-white" style={{ background: "var(--em)" }}>
                   {wishlist.length}
                 </span>
               )}
             </button>
-            <button className="btn-ink flex items-center gap-2">
+            <button className="btn-em flex items-center gap-2 ml-1">
               <Icon name="ShoppingBag" size={15} className="text-white" />
-              КОРЗИНА
-              {cartCount > 0 && (
-                <span className="font-bold text-[10px] px-1.5 py-0.5 text-black" style={{ background: "var(--yellow)" }}>
-                  {cartCount}
+              <span className="hidden sm:inline">Корзина</span>
+              {cartItems.length > 0 && (
+                <span className="font-bold text-[11px] bg-white rounded-full w-5 h-5 flex items-center justify-center" style={{ color: "var(--em)" }}>
+                  {cartItems.length}
                 </span>
               )}
             </button>
@@ -135,12 +254,18 @@ export default function Index() {
         </div>
 
         {/* Nav */}
-        <nav className="max-w-7xl mx-auto px-6 pb-2.5 flex gap-6 overflow-x-auto border-t border-gray-100">
-          {NAV.map(l => (
+        <nav className="max-w-6xl mx-auto px-5 flex gap-6 overflow-x-auto" style={{ borderTop: "1px solid var(--line)" }}>
+          {[
+            { label: "Главная",    id: "home" },
+            { label: "Каталог",    id: "catalog" },
+            { label: "Акции",      id: "sales" },
+            { label: "Продавцы",   id: "sellers" },
+            { label: "О нас",      id: "about" },
+          ].map(l => (
             <button
               key={l.id}
-              onClick={() => goTo(l.id)}
-              className={`nav-item py-2 ${activeNav === l.id ? "nav-active" : ""}`}
+              onClick={() => scrollTo(l.id)}
+              className={`nav-link ${activeNav === l.id ? "active" : ""}`}
             >
               {l.label}
             </button>
@@ -148,386 +273,266 @@ export default function Index() {
         </nav>
       </header>
 
-      {/* ── HERO (асимметричная сетка) ── */}
-      <section id="home" className="max-w-7xl mx-auto px-6 py-10">
-
-        {/* Главный заголовок */}
-        <div className="grid grid-cols-12 gap-0 mb-0" style={{ border: "3px solid var(--ink)" }}>
-
-          {/* Left — текст */}
-          <div className="col-span-12 md:col-span-7 block-white p-10 md:p-14" style={{ borderRight: "3px solid var(--ink)" }}>
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-5" style={{ color: "var(--mid)" }}>
-              Маркетплейс · 50 000+ товаров
+      {/* ── HERO ── */}
+      <section id="home" className="border-b" style={{ borderColor: "var(--line)" }}>
+        <div className="max-w-6xl mx-auto px-5 py-12 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="fade-in">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--em)" }}>
+              Маркетплейс · {city ?? "Выберите город"}
             </p>
-            <h1 className="display mb-6" style={{ fontSize: "clamp(52px, 7vw, 96px)" }}>
-              ИЩИТЕ<br />
-              <span style={{ color: "var(--teal)" }}>ВЫГОДНО</span><br />
-              ИЩИТЕ<br />
-              <span style={{ WebkitTextStroke: "3px var(--ink)", WebkitTextFillColor: "transparent" }}>
-                ВСЕТИ-ГОРОДА
-              </span>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight mb-4" style={{ color: "var(--ink)" }}>
+              Лучшие товары<br />
+              <span style={{ color: "var(--em)" }}>рядом с вами</span>
             </h1>
-            <p className="text-sm leading-relaxed mb-8 max-w-sm" style={{ color: "var(--mid)" }}>
-              Тысячи товаров от проверенных продавцов по всей стране. Честные цены и быстрая доставка.
+            <p className="text-sm leading-relaxed mb-7 max-w-md" style={{ color: "var(--sub)" }}>
+              50 000+ товаров от проверенных продавцов. Честные отзывы, прозрачные цены, доставка за 1 день.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <button className="btn-yellow">КАТАЛОГ →</button>
-              <button className="btn-outline">СТАТЬ ПРОДАВЦОМ</button>
+            <div className="flex gap-3">
+              <button className="btn-em" onClick={() => scrollTo("catalog")}>Смотреть каталог</button>
+              <button className="btn-outline-em" onClick={() => setShowCity(true)}>
+                <Icon name="MapPin" size={14} className="inline mr-1.5" />
+                {city ?? "Выбрать город"}
+              </button>
             </div>
           </div>
 
-          {/* Right — stats */}
-          <div className="col-span-12 md:col-span-5 grid grid-cols-2 grid-rows-2">
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-3 shrink-0 fade-in">
             {[
-              { v: "50K+",  l: "товаров",   cls: "block-yellow" },
-              { v: "2400+", l: "продавцов", cls: "block-ink" },
-              { v: "4.8★",  l: "рейтинг",  cls: "block-teal" },
-              { v: "1 день",l: "доставка",  cls: "block-coral" },
+              { v: "50 000+", l: "товаров" },
+              { v: "2 400+",  l: "продавцов" },
+              { v: "4.8 ★",   l: "рейтинг" },
+              { v: "1 день",  l: "доставка" },
             ].map((s, i) => (
-              <div
-                key={i}
-                className={`${s.cls} flex flex-col items-center justify-center py-10`}
-                style={{
-                  borderTop: i >= 2 ? "3px solid var(--ink)" : undefined,
-                  borderLeft: i % 2 !== 0 ? "3px solid var(--ink)" : undefined,
-                }}
-              >
-                <div className="display text-4xl">{s.v}</div>
-                <div className="text-xs uppercase tracking-widest mt-1 opacity-70">{s.l}</div>
+              <div key={i} className="rounded-xl px-6 py-5 text-center" style={{ border: "1px solid var(--line)" }}>
+                <div className="text-2xl font-bold mb-0.5" style={{ color: "var(--em)" }}>{s.v}</div>
+                <div className="text-xs" style={{ color: "var(--sub)" }}>{s.l}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CATEGORIES ── */}
-      <section id="categories" className="max-w-7xl mx-auto px-6 pb-10">
-        <div className="flex items-end justify-between mb-5">
-          <h2 className="display text-4xl">КАТЕГОРИИ</h2>
-          <button className="nav-item flex items-center gap-1">ВСЕ <Icon name="ArrowRight" size={14} /></button>
-        </div>
-        <hr className="thick-rule mb-5" />
+      {/* ── CATALOG ── */}
+      <section id="catalog" className="py-10 px-5">
+        <div className="max-w-6xl mx-auto">
 
-        {/* 8-col grid */}
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-0" style={{ border: "3px solid var(--ink)" }}>
-          {CATS.map((cat, i) => (
-            <button
-              key={i}
-              className={`${cat.cls} flex flex-col items-center justify-center gap-2 py-8 transition-all hover:brightness-95`}
-              style={{
-                borderRight: i < CATS.length - 1 ? "3px solid var(--ink)" : undefined,
-                minHeight: 110,
-              }}
-            >
-              <span className="text-3xl">{cat.emoji}</span>
-              <span className="display text-sm uppercase tracking-wide">{cat.name}</span>
-              <span className="text-[10px] opacity-60 font-medium">{cat.count}</span>
-            </button>
-          ))}
+          {/* Category tabs */}
+          <div className="flex gap-2 flex-wrap mb-6">
+            {CATS.map(c => (
+              <button
+                key={c}
+                onClick={() => setActiveCat(c)}
+                className="text-xs font-semibold px-4 py-2 rounded-full border transition-all"
+                style={activeCat === c
+                  ? { background: "var(--em)", color: "#fff", borderColor: "var(--em)" }
+                  : { background: "#fff", color: "var(--sub)", borderColor: "var(--line)" }
+                }
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+
+          {/* Tabs: popular / new / sale */}
+          <div className="flex gap-6 border-b mb-6" style={{ borderColor: "var(--line)" }}>
+            {[
+              { id: "popular", label: "Популярное" },
+              { id: "new",     label: "Новинки" },
+              { id: "sale",    label: "Со скидкой" },
+            ].map(t => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`tab-btn ${tab === t.id ? "active" : ""}`}
+              >
+                {t.label}
+              </button>
+            ))}
+            <span className="ml-auto text-xs self-center" style={{ color: "var(--sub)" }}>
+              {displayed.length} товаров
+            </span>
+          </div>
+
+          {/* Grid */}
+          {displayed.length === 0 ? (
+            <div className="text-center py-20" style={{ color: "var(--sub)" }}>
+              <Icon name="Search" size={32} className="mx-auto mb-3 opacity-30" />
+              <div className="font-medium">Ничего не найдено</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 fade-in">
+              {displayed.map(p => (
+                <div key={p.id} className="p-card group">
+                  {/* Photo */}
+                  <div className="relative h-48 flex items-center justify-center" style={{ background: "var(--bg-off)" }}>
+                    <span className="text-6xl">{p.emoji}</span>
+
+                    {p.badge && (
+                      <span className={`absolute top-2.5 left-2.5 ${p.badge === "ТОП" || p.badge === "ХИТ" ? "badge-dark" : "badge-em"}`}>
+                        {p.badge}
+                      </span>
+                    )}
+                    <button
+                      onClick={e => { e.stopPropagation(); toggleWish(p.id); }}
+                      className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity border"
+                      style={{ borderColor: "var(--line)", color: wishlist.includes(p.id) ? "var(--em)" : "#ccc" }}
+                    >
+                      <span className="text-sm">{wishlist.includes(p.id) ? "♥" : "♡"}</span>
+                    </button>
+
+                    {/* Rating в углу */}
+                    <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-white/90 rounded px-1.5 py-0.5 shadow-sm">
+                      <Stars r={p.rating} size={10} />
+                      <span className="text-[10px] font-semibold" style={{ color: "var(--ink)" }}>{p.rating}</span>
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-4">
+                    <h3 className="text-sm font-semibold leading-snug mb-1" style={{ color: "var(--ink)" }}>{p.name}</h3>
+
+                    {/* Seller — кликабельный */}
+                    <button
+                      className="text-xs mb-3 hover:underline transition-colors"
+                      style={{ color: "var(--em)" }}
+                      onClick={() => setSellerPage(p.sellerId)}
+                    >
+                      {seller(p.sellerId).name}
+                    </button>
+
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <div className="font-bold text-base" style={{ color: "var(--ink)" }}>
+                          {p.price.toLocaleString("ru-RU")} ₽
+                        </div>
+                        {p.oldPrice && (
+                          <div className="text-xs line-through" style={{ color: "var(--sub)" }}>
+                            {p.oldPrice.toLocaleString("ru-RU")} ₽
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => addToCart(p.id)}
+                        className={`text-xs font-semibold px-3.5 py-2 rounded-md transition-all ${cartItems.includes(p.id) ? "btn-outline-em" : "btn-em-sm"}`}
+                      >
+                        {cartItems.includes(p.id) ? "✓" : "Купить"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* ── SALES ── */}
-      <section id="sales" className="max-w-7xl mx-auto px-6 pb-10">
-        <div className="flex items-end justify-between mb-5">
-          <h2 className="display text-4xl">АКЦИИ</h2>
-          <button className="nav-item flex items-center gap-1">ВСЕ <Icon name="ArrowRight" size={14} /></button>
-        </div>
-        <hr className="thick-rule mb-5" />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0" style={{ border: "3px solid var(--ink)" }}>
-          {[
-            { title: "ЭЛЕКТРОНИКА", discount: "до 40%", ends: "2 дня",  cls: "block-yellow", accentCls: "text-black" },
-            { title: "ОДЕЖДА",      discount: "до 60%", ends: "5 дней", cls: "block-teal",   accentCls: "text-white" },
-            { title: "ДОМ И САД",   discount: "до 35%", ends: "3 дня",  cls: "block-coral",  accentCls: "text-white" },
-          ].map((s, i) => (
-            <div
-              key={i}
-              className={`${s.cls} p-8`}
-              style={{ borderRight: i < 2 ? "3px solid var(--ink)" : undefined }}
-            >
-              <div className="display text-5xl mb-1">{s.discount}</div>
-              <div className="display text-xl mb-1">{s.title}</div>
-              <div className="text-xs uppercase tracking-widest mb-6 opacity-60">Осталось {s.ends}</div>
-              <button
-                className="border-2 font-bold uppercase tracking-widest text-xs py-2.5 px-6 transition-all hover:bg-black hover:text-white hover:border-black"
-                style={{ borderColor: "currentColor" }}
-              >
-                Смотреть →
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Wide banner */}
-        <div className="block-ink mt-0 px-10 py-8 flex flex-col md:flex-row items-center justify-between gap-6"
-          style={{ borderLeft: "3px solid var(--ink)", borderRight: "3px solid var(--ink)", borderBottom: "3px solid var(--ink)" }}>
-          <div>
-            <div className="text-xs uppercase tracking-[0.25em] mb-2" style={{ color: "var(--mid)" }}>МЕГАРАСПРОДАЖА</div>
-            <div className="display text-5xl text-white">ДО <span style={{ color: "var(--yellow)" }}>70%</span> НА ВСЁ</div>
-          </div>
-          <button className="btn-yellow shrink-0 text-base px-10 py-4">ПЕРЕЙТИ →</button>
-        </div>
-      </section>
-
-      {/* ── POPULAR ── */}
-      <section id="popular" className="max-w-7xl mx-auto px-6 pb-10">
-        <div className="flex items-end justify-between mb-5">
-          <h2 className="display text-4xl">ПОПУЛЯРНОЕ</h2>
-          <div className="flex gap-2">
-            {["РЕЙТИНГ", "ЦЕНА↑", "ЦЕНА↓"].map(f => (
-              <button key={f} className="btn-outline py-1.5 px-4 text-[10px]">{f}</button>
+      <section id="sales" className="py-10 px-5 border-t" style={{ borderColor: "var(--line)", background: "var(--bg-off)" }}>
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-xl font-bold mb-6" style={{ color: "var(--ink)" }}>Акции</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { title: "Красота и уход",  discount: "до 40%", ends: "2 дня",  bg: "var(--em-light)", border: "var(--em-border)", col: "var(--em)" },
+              { title: "Дом и декор",     discount: "до 55%", ends: "5 дней", bg: "#FEF9E7",         border: "#F0C040",          col: "#B8860B" },
+              { title: "Детские товары",  discount: "до 35%", ends: "3 дня",  bg: "#F3F0FF",         border: "#C4B5FD",          col: "#7C3AED" },
+            ].map((s, i) => (
+              <div key={i} className="rounded-xl p-6 border" style={{ background: s.bg, borderColor: s.border }}>
+                <div className="text-2xl font-bold mb-1" style={{ color: s.col }}>{s.discount}</div>
+                <div className="font-semibold text-sm mb-1" style={{ color: "var(--ink)" }}>{s.title}</div>
+                <div className="text-xs mb-4" style={{ color: "var(--sub)" }}>Осталось {s.ends}</div>
+                <button className="text-xs font-semibold" style={{ color: s.col }}>Смотреть товары →</button>
+              </div>
             ))}
           </div>
         </div>
-        <hr className="thick-rule mb-5" />
+      </section>
 
-        {/* Cards: first 2 big, rest normal */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0" style={{ border: "3px solid var(--ink)" }}>
-
-          {/* Big featured */}
-          {PRODUCTS.slice(0, 2).map((p, i) => (
-            <div
-              key={p.id}
-              className={`geo-card ${i === 0 ? "geo-card-teal" : "geo-card-coral"} flex flex-col`}
-              style={{ borderRight: i === 0 ? "3px solid var(--ink)" : undefined, minHeight: 340 }}
-            >
-              {/* Image */}
-              <div className="relative h-52 flex items-center justify-center"
-                style={{ background: i === 0 ? "#e8faf7" : "#fff0f0", borderBottom: "3px solid var(--ink)" }}>
-                <span className="text-8xl">{p.emoji}</span>
-                <span className={`badge-geo absolute top-4 left-4 ${p.bColor}`}>{p.badge}</span>
-                <button onClick={() => heart(p.id)} className="absolute top-4 right-4 w-9 h-9 bg-white border-2 border-black flex items-center justify-center hover:bg-yellow-400 transition-colors">
-                  <span className="text-sm">{wishlist.includes(p.id) ? "♥" : "♡"}</span>
-                </button>
-              </div>
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="text-xs uppercase tracking-widest mb-1" style={{ color: "var(--mid)" }}>{p.cat}</div>
-                  <h3 className="display text-2xl mb-2">{p.name}</h3>
-                  <div className="flex items-center gap-2 mb-0">
-                    <Stars r={p.rating} />
-                    <span className="text-xs font-semibold">{p.rating}</span>
-                    <span className="text-xs" style={{ color: "var(--mid)" }}>({p.reviews})</span>
-                  </div>
+      {/* ── SELLERS ── */}
+      <section id="sellers" className="py-10 px-5 border-t" style={{ borderColor: "var(--line)" }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between mb-6">
+            <h2 className="text-xl font-bold" style={{ color: "var(--ink)" }}>Продавцы</h2>
+            <span className="text-xs" style={{ color: "var(--sub)" }}>{SELLERS.length} продавцов</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {SELLERS.map(s => (
+              <button
+                key={s.id}
+                className="p-card p-4 flex flex-col items-center gap-2 text-center"
+                onClick={() => setSellerPage(s.id)}
+              >
+                <div className="seller-avatar text-2xl">{s.emoji}</div>
+                <div className="font-semibold text-sm" style={{ color: "var(--ink)" }}>{s.name}</div>
+                <div className="flex items-center gap-1">
+                  <Stars r={s.rating} size={10} />
+                  <span className="text-[10px]" style={{ color: "var(--sub)" }}>{s.rating}</span>
                 </div>
-                <div className="flex items-end justify-between mt-4 pt-4" style={{ borderTop: "1px solid #eee" }}>
-                  <div>
-                    <div className="display text-3xl">{p.price.toLocaleString("ru-RU")} ₽</div>
-                    {p.oldPrice && <div className="text-xs line-through" style={{ color: "var(--mid)" }}>{p.oldPrice.toLocaleString("ru-RU")} ₽</div>}
-                  </div>
-                  <button
-                    onClick={() => buy(p.id)}
-                    className={cartItems.includes(p.id) ? "btn-outline py-2 px-5" : "btn-yellow py-2 px-5"}
-                  >
-                    {cartItems.includes(p.id) ? "✓ В КОРЗИНЕ" : "В КОРЗИНУ"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* 4 normal */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-0"
-          style={{ borderLeft: "3px solid var(--ink)", borderRight: "3px solid var(--ink)", borderBottom: "3px solid var(--ink)" }}>
-          {PRODUCTS.slice(2).map((p, i) => (
-            <div
-              key={p.id}
-              className="geo-card"
-              style={{
-                borderRight: i < 3 ? "3px solid var(--ink)" : undefined,
-                borderTop: "3px solid var(--ink)",
-              }}
-            >
-              <div className="relative h-36 flex items-center justify-center" style={{ background: "#fafafa", borderBottom: "1px solid #eee" }}>
-                <span className="text-5xl">{p.emoji}</span>
-                <span className={`badge-geo absolute top-2.5 left-2.5 ${p.bColor}`}>{p.badge}</span>
-                <button onClick={() => heart(p.id)} className="absolute top-2 right-2 text-sm"
-                  style={{ color: wishlist.includes(p.id) ? "#FF5252" : "#ccc" }}>
-                  {wishlist.includes(p.id) ? "♥" : "♡"}
-                </button>
-              </div>
-              <div className="p-4">
-                <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--mid)" }}>{p.cat}</div>
-                <h3 className="display text-base mb-2 leading-tight">{p.name}</h3>
-                <Stars r={p.rating} />
-                <div className="flex items-end justify-between mt-3">
-                  <div>
-                    <div className="display text-xl">{p.price.toLocaleString("ru-RU")} ₽</div>
-                    {p.oldPrice && <div className="text-[10px] line-through" style={{ color: "var(--mid)" }}>{p.oldPrice.toLocaleString("ru-RU")} ₽</div>}
-                  </div>
-                  <button
-                    onClick={() => buy(p.id)}
-                    className={`text-[10px] px-3 py-2 font-bold uppercase tracking-wide transition-all ${cartItems.includes(p.id) ? "btn-outline" : "btn-yellow"}`}
-                  >
-                    {cartItems.includes(p.id) ? "✓" : "+ КУПИТЬ"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+                <div className="text-[10px]" style={{ color: "var(--sub)" }}>{s.sales.toLocaleString("ru-RU")} продаж</div>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── ABOUT ── */}
-      <section id="about" className="max-w-7xl mx-auto px-6 pb-10">
-        <hr className="thick-rule mb-5" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0" style={{ border: "3px solid var(--ink)" }}>
-          <div className="block-ink p-10 md:p-12" style={{ borderRight: "3px solid var(--ink)" }}>
-            <div className="text-xs uppercase tracking-[0.2em] mb-5" style={{ color: "var(--mid)" }}>О ПЛАТФОРМЕ</div>
-            <h2 className="display text-5xl text-white mb-4">
-              ПОРЯДОК.<br />
-              <span style={{ color: "var(--yellow)" }}>СТРУКТУРА.</span><br />
-              СТИЛЬ.
-            </h2>
-            <p className="text-sm leading-relaxed mb-8 text-white/60">
-              «Всети-города» — маркетплейс для тех, кто ценит порядок. Только проверенные продавцы, прозрачные цены, реальные отзывы.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: "Shield",     title: "ЗАЩИТА",       col: "var(--yellow)" },
-                { icon: "Zap",        title: "СКОРОСТЬ",     col: "var(--teal)" },
-                { icon: "Truck",      title: "ДОСТАВКА",     col: "var(--coral)" },
-                { icon: "Star",       title: "ЧЕСТНО",       col: "var(--yellow)" },
-              ].map((f, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <Icon name={f.icon} size={18} style={{ color: f.col }} />
-                  <span className="display text-sm text-white">{f.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
+      <section id="about" className="py-10 px-5 border-t" style={{ borderColor: "var(--line)", background: "var(--bg-off)" }}>
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
           <div>
-            {/* Reviews */}
-            <div className="p-8 block-white" style={{ borderBottom: "3px solid var(--ink)" }}>
-              <div className="flex items-baseline gap-3 mb-5">
-                <span className="display text-5xl">4.8</span>
-                <span className="text-xl" style={{ color: "#FFD600" }}>★★★★★</span>
-                <span className="text-sm" style={{ color: "var(--mid)" }}>1 200+ отзывов</span>
-              </div>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--em)" }}>О платформе</p>
+            <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--ink)" }}>Всети-города</h2>
+            <p className="text-sm leading-relaxed mb-6" style={{ color: "var(--sub)" }}>
+              Маркетплейс для тех, кто ценит порядок и прозрачность. Только проверенные продавцы, реальные отзывы и честные цены — в строгой, выверенной сетке.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { author: "Анна К.",     r: 5, text: "Заказала кроссовки — пришли быстро, качество отличное!", av: "АК" },
-                { author: "Максим В.",   r: 4, text: "Смартфон как на фото. Доставка 2 дня.",                 av: "МВ" },
-              ].map((rv, i) => (
-                <div key={i} className="flex gap-3 mb-4">
-                  <div className="w-9 h-9 block-ink flex items-center justify-center text-xs font-bold shrink-0 text-white">{rv.av}</div>
+                { icon: "Shield",     t: "Защита покупателя",  d: "Гарантия возврата" },
+                { icon: "Star",       t: "Честные отзывы",     d: "От реальных покупок" },
+                { icon: "Truck",      t: "Доставка 1 день",    d: "По всей России" },
+                { icon: "Headphones", t: "Поддержка 24/7",     d: "Всегда на связи" },
+              ].map((f, i) => (
+                <div key={i} className="flex gap-3 items-start p-4 bg-white rounded-xl border" style={{ borderColor: "var(--line)" }}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--em-light)", border: "1px solid var(--em-border)" }}>
+                    <Icon name={f.icon} size={15} style={{ color: "var(--em)" }} />
+                  </div>
                   <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="display text-sm">{rv.author}</span>
-                      <Stars r={rv.r} />
-                    </div>
-                    <p className="text-xs" style={{ color: "var(--mid)" }}>{rv.text}</p>
+                    <div className="font-semibold text-xs" style={{ color: "var(--ink)" }}>{f.t}</div>
+                    <div className="text-xs" style={{ color: "var(--sub)" }}>{f.d}</div>
                   </div>
                 </div>
               ))}
             </div>
-            {/* CTA */}
-            <div className="block-yellow p-8">
-              <div className="display text-3xl mb-2">СТАНЬ ПРОДАВЦОМ</div>
-              <p className="text-xs mb-5" style={{ color: "rgba(0,0,0,0.55)" }}>Без абонентской платы. Комиссия только с продаж.</p>
-              <button className="btn-ink w-full py-3.5">ЗАРЕГИСТРИРОВАТЬСЯ →</button>
-            </div>
           </div>
-        </div>
-      </section>
 
-      {/* ── CONTACTS ── */}
-      <section id="contacts" className="max-w-7xl mx-auto px-6 pb-10">
-        <hr className="thick-rule mb-5" />
-        <h2 className="display text-4xl mb-5">КОНТАКТЫ</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0" style={{ border: "3px solid var(--ink)" }}>
-          {[
-            { icon: "Phone",  title: "ТЕЛЕФОН", value: "+7 (800) 555-35-35", sub: "Бесплатно",   cls: "block-white" },
-            { icon: "Mail",   title: "EMAIL",   value: "hello@vseti.ru",      sub: "За 2 часа",   cls: "block-teal" },
-            { icon: "MapPin", title: "ОФИС",    value: "Москва, Тверская, 1", sub: "Пн–Пт 9–18", cls: "block-yellow" },
-          ].map((c, i) => (
-            <div key={i} className={`${c.cls} p-8`} style={{ borderRight: i < 2 ? "3px solid var(--ink)" : undefined }}>
-              <Icon name={c.icon} size={22} className="mb-4" />
-              <div className="display text-xs mb-1 opacity-60">{c.title}</div>
-              <div className="display text-xl mb-0.5">{c.value}</div>
-              <div className="text-xs opacity-60">{c.sub}</div>
+          <div className="bg-white rounded-xl border p-7 text-center" style={{ borderColor: "var(--line)" }}>
+            <div className="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center" style={{ background: "var(--em-light)", border: "1.5px solid var(--em-border)" }}>
+              <Icon name="Store" size={26} style={{ color: "var(--em)" }} fallback="ShoppingBag" />
             </div>
-          ))}
+            <h3 className="text-lg font-bold mb-2" style={{ color: "var(--ink)" }}>Стать продавцом</h3>
+            <p className="text-sm mb-6" style={{ color: "var(--sub)" }}>
+              Разместите товары и начните продавать. Регистрация бесплатна — комиссия только с продаж.
+            </p>
+            <button className="btn-em w-full">Зарегистрироваться</button>
+            <div className="mt-3 text-xs" style={{ color: "var(--sub)" }}>Уже {SELLERS.length} продавцов на платформе</div>
+          </div>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="block-ink" style={{ borderTop: "3px solid var(--ink)" }}>
-        <div className="max-w-7xl mx-auto px-6 py-7 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="display text-xl text-white tracking-tight">ВСЕТИ-ГОРОДА</div>
-          <div className="text-xs tracking-widest uppercase" style={{ color: "var(--mid)" }}>© 2024 ВСЕ ПРАВА ЗАЩИЩЕНЫ</div>
-          <div className="flex gap-6 text-xs uppercase tracking-widest" style={{ color: "var(--mid)" }}>
+      <footer className="py-7 px-5 border-t" style={{ borderColor: "var(--line)" }}>
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <div className="font-bold text-sm" style={{ color: "var(--ink)" }}>Всети-города</div>
+            {city && <div className="text-xs mt-0.5 city-chip"><Icon name="MapPin" size={11} />{city}</div>}
+          </div>
+          <div className="text-xs" style={{ color: "var(--sub)" }}>© 2024 Всети-города. Все права защищены.</div>
+          <div className="flex gap-5 text-xs" style={{ color: "var(--sub)" }}>
             {["Условия", "Конфиденциальность", "Помощь"].map(l => (
-              <button key={l} className="hover:text-white transition-colors">{l}</button>
+              <button key={l} className="hover:underline">{l}</button>
             ))}
           </div>
         </div>
       </footer>
-
-      {/* ── CHATBOT ── */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-        {chatOpen && (
-          <div className="chat-in w-80 bg-white" style={{ border: "3px solid var(--ink)", boxShadow: "6px 6px 0 var(--yellow)" }}>
-            <div className="flex items-center gap-3 px-4 py-3 block-ink" style={{ borderBottom: "3px solid var(--ink)" }}>
-              <div className="w-8 h-8 block-yellow flex items-center justify-center">
-                <Icon name="Bot" size={15} className="text-black" />
-              </div>
-              <div>
-                <div className="display text-sm text-white">ПОМОЩНИК</div>
-                <div className="text-[10px] uppercase tracking-widest" style={{ color: "var(--teal)" }}>● ОНЛАЙН</div>
-              </div>
-              <button onClick={() => setChatOpen(false)} className="ml-auto text-white/60 hover:text-white">
-                <Icon name="X" size={15} />
-              </button>
-            </div>
-            <div className="h-52 overflow-y-auto p-4 flex flex-col gap-2 bg-[#fafafa]">
-              {msgs.map((m, i) => (
-                <div key={i} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className="text-xs px-3 py-2 max-w-[80%] leading-relaxed"
-                    style={
-                      m.from === "user"
-                        ? { background: "var(--ink)", color: "#fff" }
-                        : { background: "#fff", border: "2px solid var(--ink)", color: "var(--ink)" }
-                    }
-                  >{m.text}</div>
-                </div>
-              ))}
-              <div ref={endRef} />
-            </div>
-            <div className="px-3 py-2 flex flex-wrap gap-1.5 bg-white" style={{ borderTop: "2px solid #eee" }}>
-              {CHAT_TIPS.map(t => (
-                <button
-                  key={t}
-                  onClick={() => send(t)}
-                  className="text-[10px] px-2.5 py-1 font-bold uppercase tracking-wider border-2 border-black hover:bg-yellow-400 transition-colors"
-                >{t}</button>
-              ))}
-            </div>
-            <div className="flex gap-2 p-3 bg-white" style={{ borderTop: "2px solid #eee" }}>
-              <input
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && input.trim() && send(input.trim())}
-                placeholder="НАПИСАТЬ..."
-                className="flex-1 text-xs px-3 py-2 uppercase tracking-wider focus:outline-none border-2 border-black"
-              />
-              <button onClick={() => input.trim() && send(input.trim())} className="btn-ink px-3 py-2">
-                <Icon name="Send" size={13} className="text-white" />
-              </button>
-            </div>
-          </div>
-        )}
-        <button
-          onClick={() => setChatOpen(o => !o)}
-          className="w-14 h-14 block-ink flex items-center justify-center transition-all hover:-translate-y-1"
-          style={{ border: "3px solid var(--ink)", boxShadow: "4px 4px 0 var(--yellow)" }}
-        >
-          <Icon name={chatOpen ? "X" : "MessageSquare"} size={22} className="text-white" />
-        </button>
-      </div>
     </div>
   );
 }
