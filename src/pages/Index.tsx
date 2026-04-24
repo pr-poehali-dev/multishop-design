@@ -1,9 +1,27 @@
 import { useState, useRef, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 
-const HERO_IMG = "https://cdn.poehali.dev/projects/ced8c987-a177-43ce-b6ad-264704bf2b5f/files/b0b73554-a6ae-43a2-ba33-a0129089ae22.jpg";
+const PRODUCTS = [
+  { id: 1, name: "Смартфон X-Vision 12",  price: 24900, oldPrice: 31000, rating: 4.6, reviews: 89,  badge: "−20%",    bColor: "bg-[#FFD600] text-black", emoji: "📱", cat: "Электроника" },
+  { id: 2, name: "Кроссовки Urban Pro",   price: 4990,  oldPrice: 7200,  rating: 4.8, reviews: 312, badge: "ХИТ",     bColor: "bg-[#FF5252] text-white", emoji: "👟", cat: "Обувь" },
+  { id: 3, name: "Платье Summer Glow",    price: 2490,  oldPrice: null,  rating: 4.9, reviews: 204, badge: "НОВИНКА", bColor: "bg-[#00BFA5] text-white", emoji: "👗", cat: "Одежда" },
+  { id: 4, name: "Контроллер Pro X",      price: 6200,  oldPrice: 8500,  rating: 4.7, reviews: 147, badge: "−27%",    bColor: "bg-[#FFD600] text-black", emoji: "🎮", cat: "Игры" },
+  { id: 5, name: "Сыворотка Retinol",     price: 2990,  oldPrice: 3900,  rating: 4.8, reviews: 203, badge: "ТОП",     bColor: "bg-[#FF5252] text-white", emoji: "✨", cat: "Красота" },
+  { id: 6, name: "Наушники SoundWave X3", price: 8990,  oldPrice: 12000, rating: 4.8, reviews: 376, badge: "−25%",    bColor: "bg-[#00BFA5] text-white", emoji: "🎧", cat: "Электроника" },
+];
 
-const NAV_LINKS = [
+const CATS = [
+  { name: "Электроника", emoji: "📱", count: "760",   cls: "block-yellow" },
+  { name: "Одежда",      emoji: "👗", count: "3 870", cls: "block-ink" },
+  { name: "Обувь",       emoji: "👟", count: "1 240", cls: "block-teal" },
+  { name: "Красота",     emoji: "💄", count: "1 650", cls: "block-coral" },
+  { name: "Дом",         emoji: "🏠", count: "2 100", cls: "block-white" },
+  { name: "Игры",        emoji: "🎮", count: "560",   cls: "block-ink" },
+  { name: "Детям",       emoji: "👶", count: "980",   cls: "block-yellow" },
+  { name: "Инструменты", emoji: "🔧", count: "720",   cls: "block-teal" },
+];
+
+const NAV = [
   { label: "Главная",    id: "home" },
   { label: "Категории",  id: "categories" },
   { label: "Акции",      id: "sales" },
@@ -12,113 +30,68 @@ const NAV_LINKS = [
   { label: "Контакты",   id: "contacts" },
 ];
 
-const CATEGORIES = [
-  { emoji: "🏠", name: "Дом",         count: "2 100", grad: "from-[#A8E6CF] to-[#74C0FC]" },
-  { emoji: "💄", name: "Красота",     count: "1 650", grad: "from-[#FFB347] to-[#FF7EB3]" },
-  { emoji: "👶", name: "Детям",       count: "980",   grad: "from-[#C084FC] to-[#74C0FC]" },
-  { emoji: "👗", name: "Одежда",      count: "3 870", grad: "from-[#FF7EB3] to-[#FFB347]" },
-  { emoji: "📱", name: "Гаджеты",    count: "760",   grad: "from-[#74C0FC] to-[#C084FC]" },
-  { emoji: "🌿", name: "Растения",   count: "430",   grad: "from-[#A8E6CF] to-[#C084FC]" },
-  { emoji: "🍽", name: "Кухня",      count: "1 200", grad: "from-[#FFB347] to-[#A8E6CF]" },
-  { emoji: "🛁", name: "Ванная",     count: "640",   grad: "from-[#74C0FC] to-[#FF7EB3]" },
-];
+const TICKER = ["⬛ Доставка за 1 день", "◆ 50 000+ товаров", "◆ Возврат 14 дней", "⬛ Продавцы со всей России", "◆ Рейтинг 4.8 / 5", "◆ Поддержка 24 / 7"];
 
-const PRODUCTS = [
-  { id: 1, name: "Диффузор «Лаванда»",  price: 1490, oldPrice: 2100, rating: 4.8, reviews: 312, badge: "ХИТ",     badgeType: "mint",  emoji: "🕯",  seller: "АромаДом" },
-  { id: 2, name: "Крем-флюид Glow",     price: 2290, oldPrice: 3200, rating: 4.9, reviews: 521, badge: "−28%",   badgeType: "rose",  emoji: "💆",  seller: "БьютиМир" },
-  { id: 3, name: "Конструктор Blocks+", price: 1890, oldPrice: null, rating: 4.7, reviews: 89,  badge: "НОВИНКА", badgeType: "lav",   emoji: "🧩",  seller: "ДетскийМир" },
-  { id: 4, name: "Ваза Marble Grey",    price: 3490, oldPrice: 4800, rating: 4.6, reviews: 147, badge: "−27%",   badgeType: "mint",  emoji: "🏺",  seller: "ДомДекор" },
-  { id: 5, name: "Сыворотка Retinol",   price: 2990, oldPrice: 3900, rating: 4.8, reviews: 203, badge: "ТОП",    badgeType: "rose",  emoji: "✨",  seller: "Beautylab" },
-  { id: 6, name: "Термокружка Pastel",  price: 1190, oldPrice: 1600, rating: 4.5, reviews: 376, badge: "−25%",   badgeType: "lav",   emoji: "☕",  seller: "КухняПро" },
-];
-
-const CHAT_TIPS = ["Где мои заказы?", "Как вернуть товар?", "Стать продавцом", "Есть рассрочка?"];
-const BOT_REPLIES: Record<string, string> = {
-  "Где мои заказы?":   "Ваши заказы — в Личном кабинете → «Мои заказы» 🛍",
-  "Как вернуть товар?":"Возврат в течение 14 дней прямо в карточке заказа ✅",
-  "Стать продавцом":   "Регистрация бесплатна, комиссия только с продаж 🌟",
-  "Есть рассрочка?":   "Рассрочка 0% от 5 000 ₽ при оформлении заказа 💳",
+const CHAT_TIPS = ["Где заказ?", "Возврат", "Стать продавцом", "Рассрочка"];
+const BOT: Record<string, string> = {
+  "Где заказ?":         "Ваши заказы — Личный кабинет → «Мои заказы».",
+  "Возврат":            "Возврат в течение 14 дней через карточку заказа.",
+  "Стать продавцом":    "Регистрация бесплатна. Комиссия только с продаж.",
+  "Рассрочка":          "Рассрочка 0% от 5 000 ₽ при оформлении.",
 };
 
-interface ChatMsg { from: "user" | "bot"; text: string; }
+interface Msg { from: "user" | "bot"; text: string; }
 
-function Stars({ rating }: { rating: number }) {
+function Stars({ r }: { r: number }) {
   return (
-    <span className="text-xs">
-      {[1,2,3,4,5].map(s => (
-        <span key={s} style={{ color: s <= Math.round(rating) ? "#FFB347" : "#ddd" }}>★</span>
-      ))}
+    <span className="text-xs tracking-tight">
+      {"★".repeat(Math.round(r))}<span className="text-gray-200">{"★".repeat(5 - Math.round(r))}</span>
     </span>
   );
 }
 
 export default function Index() {
-  const [activeNav, setActiveNav]   = useState("home");
-  const [activeCat, setActiveCat]   = useState("");
-  const [cartCount, setCartCount]   = useState(0);
-  const [cartItems, setCartItems]   = useState<number[]>([]);
-  const [wishlist, setWishlist]     = useState<number[]>([]);
-  const [search, setSearch]         = useState("");
-  const [chatOpen, setChatOpen]     = useState(false);
-  const [chatMsgs, setChatMsgs]     = useState<ChatMsg[]>([
-    { from: "bot", text: "Привет! 🌸 Чем могу помочь? Выбери вопрос или напиши сам." },
-  ]);
-  const [chatInput, setChatInput]   = useState("");
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [activeNav, setActiveNav] = useState("home");
+  const [cartCount, setCartCount] = useState(0);
+  const [cartItems, setCartItems] = useState<number[]>([]);
+  const [wishlist,  setWishlist]  = useState<number[]>([]);
+  const [search,    setSearch]    = useState("");
+  const [chatOpen,  setChatOpen]  = useState(false);
+  const [msgs, setMsgs]           = useState<Msg[]>([{ from: "bot", text: "Здравствуйте. Чем могу помочь?" }]);
+  const [input, setInput]         = useState("");
+  const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMsgs]);
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
-  const addToCart = (id: number) => {
-    if (!cartItems.includes(id)) {
-      setCartItems(p => [...p, id]);
-      setCartCount(c => c + 1);
-    }
-  };
-  const toggleWishlist = (id: number) => {
-    setWishlist(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]);
-  };
-  const scrollTo = (id: string) => {
-    setActiveNav(id);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-  const sendMsg = (text: string) => {
-    setChatMsgs(p => [...p, { from: "user", text }]);
-    const reply = BOT_REPLIES[text] ?? "Уточни вопрос, мы скоро ответим! ☎️ 8 800 555-35-35";
-    setTimeout(() => setChatMsgs(p => [...p, { from: "bot", text: reply }]), 500);
-    setChatInput("");
-  };
-
-  const badgeEl = (type: string, text: string) => {
-    const cls = type === "mint" ? "badge-mint" : type === "rose" ? "badge-rose" : "badge-lav";
-    return <span className={cls}>{text}</span>;
+  const buy     = (id: number) => { if (!cartItems.includes(id)) { setCartItems(p => [...p, id]); setCartCount(c => c + 1); } };
+  const heart   = (id: number) => { setWishlist(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); };
+  const goTo    = (id: string) => { setActiveNav(id); document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); };
+  const send    = (t: string)  => {
+    setMsgs(p => [...p, { from: "user", text: t }]);
+    setTimeout(() => setMsgs(p => [...p, { from: "bot", text: BOT[t] ?? "Уточните вопрос — ответим быстро." }]), 450);
+    setInput("");
   };
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden" style={{ fontFamily: "'Golos Text', sans-serif" }}>
+    <div className="min-h-screen" style={{ background: "#F5F5F5", fontFamily: "'IBM Plex Sans', sans-serif" }}>
 
-      {/* Background blobs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
-        <div className="blob w-[600px] h-[600px] -top-40 -right-40" style={{ background: "#A8E6CF" }} />
-        <div className="blob w-[500px] h-[500px] top-1/3 -left-60"  style={{ background: "#74C0FC" }} />
-        <div className="blob w-[400px] h-[400px] bottom-20 right-10" style={{ background: "#FFB347", opacity: 0.25 }} />
-        <div className="blob w-[350px] h-[350px] bottom-1/3 left-1/3" style={{ background: "#FF7EB3", opacity: 0.2 }} />
+      {/* ── TICKER ── */}
+      <div className="block-ink overflow-hidden py-2 text-xs select-none" style={{ borderBottom: "1px solid #222" }}>
+        <div className="flex w-max ticker-track gap-16">
+          {[...TICKER, ...TICKER].map((t, i) => (
+            <span key={i} className="whitespace-nowrap font-medium tracking-widest text-white/70">{t}</span>
+          ))}
+        </div>
       </div>
 
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 glass-header">
-        <div className="max-w-6xl mx-auto px-6 py-3.5 flex items-center gap-5">
+      <header className="sticky top-0 z-50 bg-white" style={{ borderBottom: "3px solid #0F0F0F" }}>
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-6">
 
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <div className="font-black text-lg tracking-tight" style={{
-              background: "linear-gradient(135deg, #4a9fd4 0%, #2dba8a 100%)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            }}>
-              Всети-города
-            </div>
-            <div className="text-[9px] tracking-[0.18em] font-semibold uppercase" style={{ color: "var(--muted-t)" }}>маркетплейс</div>
+          <div className="flex-shrink-0 mr-2">
+            <div className="display text-2xl tracking-tight" style={{ fontFamily: "Oswald, sans-serif" }}>ВСЕТИ-ГОРОДА</div>
+            <div className="text-[9px] tracking-[0.25em] font-semibold uppercase" style={{ color: "var(--mid)" }}>МАРКЕТПЛЕЙС</div>
           </div>
 
           {/* Search */}
@@ -126,37 +99,34 @@ export default function Index() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Найти товар, категорию..."
-              className="search-field w-full pl-11 pr-5 py-2.5 text-sm"
-              style={{ color: "var(--text)" }}
+              placeholder="ПОИСК ТОВАРОВ..."
+              className="search-geo w-full pl-11 pr-5 py-2.5 text-sm uppercase tracking-wider"
             />
-            <Icon name="Search" size={16} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "#74C0FC" }} />
+            <Icon name="Search" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black" />
             {search && (
-              <button onClick={() => setSearch("")} className="absolute right-4 top-1/2 -translate-y-1/2" style={{ color: "var(--muted-t)" }}>
+              <button onClick={() => setSearch("")} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">
                 <Icon name="X" size={14} />
               </button>
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-2 ml-auto">
-            <button className="p-2.5 rounded-full transition-all hover:bg-white/60" style={{ color: "var(--muted-t)" }}>
-              <Icon name="User" size={19} />
+            <button className="p-2.5 hover:bg-gray-100 transition-colors" style={{ color: "var(--mid)" }}>
+              <Icon name="User" size={20} />
             </button>
-            <button className="relative p-2.5 rounded-full transition-all hover:bg-white/60" style={{ color: "var(--muted-t)" }}>
-              <Icon name="Heart" size={19} />
+            <button className="relative p-2.5 hover:bg-gray-100 transition-colors" style={{ color: "var(--mid)" }}>
+              <Icon name="Heart" size={20} />
               {wishlist.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center text-white"
-                  style={{ background: "linear-gradient(135deg,#FFB347,#FF7EB3)" }}>
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center text-[9px] font-bold text-black" style={{ background: "var(--yellow)" }}>
                   {wishlist.length}
                 </span>
               )}
             </button>
-            <button className="btn-gradient flex items-center gap-2 px-5 py-2.5 text-sm">
-              <Icon name="ShoppingBag" size={16} />
-              <span className="hidden sm:inline">Корзина</span>
+            <button className="btn-ink flex items-center gap-2">
+              <Icon name="ShoppingBag" size={15} className="text-white" />
+              КОРЗИНА
               {cartCount > 0 && (
-                <span className="font-black text-[11px] bg-white/70 rounded-full w-5 h-5 flex items-center justify-center" style={{ color: "#1a3a5c" }}>
+                <span className="font-bold text-[10px] px-1.5 py-0.5 text-black" style={{ background: "var(--yellow)" }}>
                   {cartCount}
                 </span>
               )}
@@ -165,12 +135,12 @@ export default function Index() {
         </div>
 
         {/* Nav */}
-        <nav className="max-w-6xl mx-auto px-6 pb-2.5 flex gap-1.5 overflow-x-auto">
-          {NAV_LINKS.map(l => (
+        <nav className="max-w-7xl mx-auto px-6 pb-2.5 flex gap-6 overflow-x-auto border-t border-gray-100">
+          {NAV.map(l => (
             <button
               key={l.id}
-              onClick={() => scrollTo(l.id)}
-              className={`nav-pill px-4 py-1.5 ${activeNav === l.id ? "nav-pill-active" : ""}`}
+              onClick={() => goTo(l.id)}
+              className={`nav-item py-2 ${activeNav === l.id ? "nav-active" : ""}`}
             >
               {l.label}
             </button>
@@ -178,319 +148,319 @@ export default function Index() {
         </nav>
       </header>
 
-      {/* ── HERO ── */}
-      <section id="home" className="relative z-10 py-20 px-6">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-14 items-center">
-          <div className="animate-fade-up">
-            <div className="tag-mint mb-5">✦ 50 000+ товаров · Доставка за 1 день</div>
-            <h1 className="font-black leading-[1.05] tracking-tight mb-6" style={{ fontSize: "clamp(40px,5.5vw,72px)", color: "var(--text)" }}>
-              Покупай с<br />
-              <span style={{ background: "linear-gradient(135deg, #4a9fd4 0%, #2dba8a 60%, #FF7EB3 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                радостью
+      {/* ── HERO (асимметричная сетка) ── */}
+      <section id="home" className="max-w-7xl mx-auto px-6 py-10">
+
+        {/* Главный заголовок */}
+        <div className="grid grid-cols-12 gap-0 mb-0" style={{ border: "3px solid var(--ink)" }}>
+
+          {/* Left — текст */}
+          <div className="col-span-12 md:col-span-7 block-white p-10 md:p-14" style={{ borderRight: "3px solid var(--ink)" }}>
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-5" style={{ color: "var(--mid)" }}>
+              Маркетплейс · 50 000+ товаров
+            </p>
+            <h1 className="display mb-6" style={{ fontSize: "clamp(52px, 7vw, 96px)" }}>
+              ИЩИТЕ<br />
+              <span style={{ color: "var(--teal)" }}>ВЫГОДНО</span><br />
+              ИЩИТЕ<br />
+              <span style={{ WebkitTextStroke: "3px var(--ink)", WebkitTextFillColor: "transparent" }}>
+                ВСЕТИ-ГОРОДА
               </span>
             </h1>
-            <p className="text-base mb-9 leading-relaxed max-w-md" style={{ color: "var(--muted-t)" }}>
-              Уютный маркетплейс для дома, красоты и жизни. Тысячи товаров от проверенных продавцов — с заботой о тебе.
+            <p className="text-sm leading-relaxed mb-8 max-w-sm" style={{ color: "var(--mid)" }}>
+              Тысячи товаров от проверенных продавцов по всей стране. Честные цены и быстрая доставка.
             </p>
             <div className="flex flex-wrap gap-3">
-              <button className="btn-gradient px-8 py-3.5 text-sm font-bold">Смотреть каталог</button>
-              <button className="btn-outline-grad px-8 py-3.5 text-sm font-bold">Стать продавцом</button>
-            </div>
-
-            <div className="flex gap-8 mt-10 pt-8 border-t border-sky-100">
-              {[
-                { v: "50K+",  l: "товаров" },
-                { v: "2400+", l: "продавцов" },
-                { v: "4.8★",  l: "рейтинг" },
-                { v: "1 день",l: "доставка" },
-              ].map((s, i) => (
-                <div key={i} className={`animate-fade-up d${i+1}`}>
-                  <div className="font-black text-xl" style={{ color: "var(--text)" }}>{s.v}</div>
-                  <div className="text-xs font-medium" style={{ color: "var(--muted-t)" }}>{s.l}</div>
-                </div>
-              ))}
+              <button className="btn-yellow">КАТАЛОГ →</button>
+              <button className="btn-outline">СТАТЬ ПРОДАВЦОМ</button>
             </div>
           </div>
 
-          <div className="hidden md:block relative animate-fade-up d2">
-            <div className="rounded-3xl overflow-hidden shadow-2xl" style={{ boxShadow: "0 24px 64px rgba(116,192,252,0.25)" }}>
-              <img src={HERO_IMG} alt="" className="w-full object-cover" style={{ maxHeight: 420 }} />
-            </div>
-            {/* Floating cards */}
-            <div className="absolute -bottom-5 -left-6 float-card px-5 py-4 shadow-xl">
-              <div className="text-xs mb-0.5" style={{ color: "var(--muted-t)" }}>Заказов сегодня</div>
-              <div className="font-black text-2xl" style={{ background: "linear-gradient(135deg,#74C0FC,#A8E6CF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                1 247 ↑
+          {/* Right — stats */}
+          <div className="col-span-12 md:col-span-5 grid grid-cols-2 grid-rows-2">
+            {[
+              { v: "50K+",  l: "товаров",   cls: "block-yellow" },
+              { v: "2400+", l: "продавцов", cls: "block-ink" },
+              { v: "4.8★",  l: "рейтинг",  cls: "block-teal" },
+              { v: "1 день",l: "доставка",  cls: "block-coral" },
+            ].map((s, i) => (
+              <div
+                key={i}
+                className={`${s.cls} flex flex-col items-center justify-center py-10`}
+                style={{
+                  borderTop: i >= 2 ? "3px solid var(--ink)" : undefined,
+                  borderLeft: i % 2 !== 0 ? "3px solid var(--ink)" : undefined,
+                }}
+              >
+                <div className="display text-4xl">{s.v}</div>
+                <div className="text-xs uppercase tracking-widest mt-1 opacity-70">{s.l}</div>
               </div>
-            </div>
-            <div className="absolute -top-4 -right-5 float-card px-4 py-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">⭐</span>
-                <div>
-                  <div className="font-black text-sm" style={{ color: "var(--text)" }}>4.8 / 5</div>
-                  <div className="text-[10px]" style={{ color: "var(--muted-t)" }}>1200+ отзывов</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ── CATEGORIES ── */}
-      <section id="categories" className="relative z-10 py-14 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--text)" }}>Категории</h2>
-              <p className="text-sm mt-1" style={{ color: "var(--muted-t)" }}>Что тебя интересует?</p>
-            </div>
-            <button className="text-sm font-semibold flex items-center gap-1" style={{ color: "#4a9fd4" }}>
-              Все <Icon name="ChevronRight" size={14} />
+      <section id="categories" className="max-w-7xl mx-auto px-6 pb-10">
+        <div className="flex items-end justify-between mb-5">
+          <h2 className="display text-4xl">КАТЕГОРИИ</h2>
+          <button className="nav-item flex items-center gap-1">ВСЕ <Icon name="ArrowRight" size={14} /></button>
+        </div>
+        <hr className="thick-rule mb-5" />
+
+        {/* 8-col grid */}
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-0" style={{ border: "3px solid var(--ink)" }}>
+          {CATS.map((cat, i) => (
+            <button
+              key={i}
+              className={`${cat.cls} flex flex-col items-center justify-center gap-2 py-8 transition-all hover:brightness-95`}
+              style={{
+                borderRight: i < CATS.length - 1 ? "3px solid var(--ink)" : undefined,
+                minHeight: 110,
+              }}
+            >
+              <span className="text-3xl">{cat.emoji}</span>
+              <span className="display text-sm uppercase tracking-wide">{cat.name}</span>
+              <span className="text-[10px] opacity-60 font-medium">{cat.count}</span>
             </button>
-          </div>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-            {CATEGORIES.map((cat, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveCat(cat.name)}
-                className="float-card p-4 flex flex-col items-center gap-2.5 text-center transition-all"
-                style={activeCat === cat.name ? { boxShadow: "0 8px 32px rgba(116,192,252,0.3)", borderColor: "#74C0FC" } : {}}
-              >
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${cat.grad} flex items-center justify-center text-2xl shadow-sm`}>
-                  {cat.emoji}
-                </div>
-                <div className="text-xs font-semibold leading-tight" style={{ color: "var(--text)" }}>{cat.name}</div>
-                <div className="text-[10px]" style={{ color: "var(--muted-t)" }}>{cat.count}</div>
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
       </section>
 
       {/* ── SALES ── */}
-      <section id="sales" className="relative z-10 py-14 px-6 section-peach">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--text)" }}>Акции 🌸</h2>
-            <p className="text-sm mt-1" style={{ color: "var(--muted-t)" }}>Успей поймать выгоду</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-            {[
-              { title: "Красота и уход",  discount: "до 40%", ends: "2 дня",  emoji: "💆", grad: "from-[#FFB347] to-[#FF7EB3]" },
-              { title: "Дом и декор",     discount: "до 55%", ends: "5 дней", emoji: "🏠", grad: "from-[#74C0FC] to-[#A8E6CF]" },
-              { title: "Детские товары",  discount: "до 35%", ends: "3 дня",  emoji: "👶", grad: "from-[#C084FC] to-[#FF7EB3]" },
-            ].map((s, i) => (
-              <div key={i} className="float-card p-7 cursor-pointer group">
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.grad} flex items-center justify-center text-3xl mb-5 shadow-md group-hover:scale-110 transition-transform`}>
-                  {s.emoji}
-                </div>
-                <div className="font-black text-4xl mb-1" style={{
-                  background: `linear-gradient(135deg, ${i===0?"#FFB347,#FF7EB3":i===1?"#74C0FC,#A8E6CF":"#C084FC,#FF7EB3"})`,
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                }}>
-                  {s.discount}
-                </div>
-                <div className="font-semibold mb-1" style={{ color: "var(--text)" }}>{s.title}</div>
-                <div className="text-xs mb-5" style={{ color: "var(--muted-t)" }}>Осталось {s.ends}</div>
-                <button className="btn-outline-grad text-xs px-5 py-2 font-semibold">Смотреть →</button>
-              </div>
-            ))}
-          </div>
+      <section id="sales" className="max-w-7xl mx-auto px-6 pb-10">
+        <div className="flex items-end justify-between mb-5">
+          <h2 className="display text-4xl">АКЦИИ</h2>
+          <button className="nav-item flex items-center gap-1">ВСЕ <Icon name="ArrowRight" size={14} /></button>
+        </div>
+        <hr className="thick-rule mb-5" />
 
-          {/* Wide banner */}
-          <div className="float-card overflow-hidden" style={{ background: "linear-gradient(135deg, #e0f2fe 0%, #fce4f3 100%)" }}>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8">
-              <div>
-                <div className="tag-mint mb-3">МЕГАРАСПРОДАЖА</div>
-                <div className="font-black text-4xl mb-2" style={{ color: "var(--text)" }}>до 70% на всё</div>
-                <p className="text-sm" style={{ color: "var(--muted-t)" }}>Только сегодня — лучшие предложения сезона</p>
-              </div>
-              <button className="btn-peach px-10 py-4 text-base font-bold shrink-0">Перейти в акции</button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0" style={{ border: "3px solid var(--ink)" }}>
+          {[
+            { title: "ЭЛЕКТРОНИКА", discount: "до 40%", ends: "2 дня",  cls: "block-yellow", accentCls: "text-black" },
+            { title: "ОДЕЖДА",      discount: "до 60%", ends: "5 дней", cls: "block-teal",   accentCls: "text-white" },
+            { title: "ДОМ И САД",   discount: "до 35%", ends: "3 дня",  cls: "block-coral",  accentCls: "text-white" },
+          ].map((s, i) => (
+            <div
+              key={i}
+              className={`${s.cls} p-8`}
+              style={{ borderRight: i < 2 ? "3px solid var(--ink)" : undefined }}
+            >
+              <div className="display text-5xl mb-1">{s.discount}</div>
+              <div className="display text-xl mb-1">{s.title}</div>
+              <div className="text-xs uppercase tracking-widest mb-6 opacity-60">Осталось {s.ends}</div>
+              <button
+                className="border-2 font-bold uppercase tracking-widest text-xs py-2.5 px-6 transition-all hover:bg-black hover:text-white hover:border-black"
+                style={{ borderColor: "currentColor" }}
+              >
+                Смотреть →
+              </button>
             </div>
+          ))}
+        </div>
+
+        {/* Wide banner */}
+        <div className="block-ink mt-0 px-10 py-8 flex flex-col md:flex-row items-center justify-between gap-6"
+          style={{ borderLeft: "3px solid var(--ink)", borderRight: "3px solid var(--ink)", borderBottom: "3px solid var(--ink)" }}>
+          <div>
+            <div className="text-xs uppercase tracking-[0.25em] mb-2" style={{ color: "var(--mid)" }}>МЕГАРАСПРОДАЖА</div>
+            <div className="display text-5xl text-white">ДО <span style={{ color: "var(--yellow)" }}>70%</span> НА ВСЁ</div>
           </div>
+          <button className="btn-yellow shrink-0 text-base px-10 py-4">ПЕРЕЙТИ →</button>
         </div>
       </section>
 
       {/* ── POPULAR ── */}
-      <section id="popular" className="relative z-10 py-14 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--text)" }}>Популярное</h2>
-              <p className="text-sm mt-1" style={{ color: "var(--muted-t)" }}>Что выбирают чаще всего</p>
-            </div>
-            <div className="flex gap-2">
-              {["Рейтинг", "Отзывы", "Цена"].map(f => (
-                <button key={f} className="text-xs px-3 py-1.5 rounded-full border font-semibold transition-all hover:border-sky-300"
-                  style={{ borderColor: "rgba(116,192,252,0.35)", color: "var(--muted-t)" }}>
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PRODUCTS.map((p, i) => (
-              <div key={p.id} className={`float-card overflow-hidden animate-fade-up d${(i % 3) + 1}`}>
-                {/* Image */}
-                <div className="relative h-52 flex items-center justify-center" style={{
-                  background: i % 3 === 0
-                    ? "linear-gradient(135deg,#e8f9f3,#e0f2fe)"
-                    : i % 3 === 1
-                    ? "linear-gradient(135deg,#fff5eb,#ffe4ef)"
-                    : "linear-gradient(135deg,#f5f0ff,#ffe4ef)",
-                }}>
-                  <span className="text-7xl">{p.emoji}</span>
-                  <div className="absolute top-3 left-3">{badgeEl(p.badgeType, p.badge)}</div>
-                  <button
-                    onClick={() => toggleWishlist(p.id)}
-                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm transition-all hover:scale-110"
-                    style={{ color: wishlist.includes(p.id) ? "#FF7EB3" : "#ccc" }}
-                  >
-                    <span className="text-base">{wishlist.includes(p.id) ? "♥" : "♡"}</span>
-                  </button>
-                </div>
-
-                <div className="p-5">
-                  <div className="text-[11px] mb-1" style={{ color: "var(--muted-t)" }}>{p.seller}</div>
-                  <h3 className="font-bold text-base mb-2 leading-snug" style={{ color: "var(--text)" }}>{p.name}</h3>
-
-                  <div className="flex items-center gap-2 mb-4">
-                    <Stars rating={p.rating} />
-                    <span className="text-xs font-semibold" style={{ color: "var(--text)" }}>{p.rating}</span>
-                    <span className="text-xs" style={{ color: "var(--muted-t)" }}>({p.reviews})</span>
-                  </div>
-
-                  <div className="flex items-end justify-between pt-4 border-t border-sky-50">
-                    <div>
-                      <div className="font-black text-xl" style={{ color: "var(--text)" }}>
-                        {p.price.toLocaleString("ru-RU")} ₽
-                      </div>
-                      {p.oldPrice && (
-                        <div className="text-xs line-through" style={{ color: "var(--muted-t)" }}>
-                          {p.oldPrice.toLocaleString("ru-RU")} ₽
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => addToCart(p.id)}
-                      className={`text-sm font-bold px-4 py-2.5 transition-all ${cartItems.includes(p.id) ? "btn-outline-grad" : "btn-gradient"}`}
-                    >
-                      {cartItems.includes(p.id) ? "✓ В корзине" : "В корзину"}
-                    </button>
-                  </div>
-                </div>
-              </div>
+      <section id="popular" className="max-w-7xl mx-auto px-6 pb-10">
+        <div className="flex items-end justify-between mb-5">
+          <h2 className="display text-4xl">ПОПУЛЯРНОЕ</h2>
+          <div className="flex gap-2">
+            {["РЕЙТИНГ", "ЦЕНА↑", "ЦЕНА↓"].map(f => (
+              <button key={f} className="btn-outline py-1.5 px-4 text-[10px]">{f}</button>
             ))}
           </div>
+        </div>
+        <hr className="thick-rule mb-5" />
+
+        {/* Cards: first 2 big, rest normal */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0" style={{ border: "3px solid var(--ink)" }}>
+
+          {/* Big featured */}
+          {PRODUCTS.slice(0, 2).map((p, i) => (
+            <div
+              key={p.id}
+              className={`geo-card ${i === 0 ? "geo-card-teal" : "geo-card-coral"} flex flex-col`}
+              style={{ borderRight: i === 0 ? "3px solid var(--ink)" : undefined, minHeight: 340 }}
+            >
+              {/* Image */}
+              <div className="relative h-52 flex items-center justify-center"
+                style={{ background: i === 0 ? "#e8faf7" : "#fff0f0", borderBottom: "3px solid var(--ink)" }}>
+                <span className="text-8xl">{p.emoji}</span>
+                <span className={`badge-geo absolute top-4 left-4 ${p.bColor}`}>{p.badge}</span>
+                <button onClick={() => heart(p.id)} className="absolute top-4 right-4 w-9 h-9 bg-white border-2 border-black flex items-center justify-center hover:bg-yellow-400 transition-colors">
+                  <span className="text-sm">{wishlist.includes(p.id) ? "♥" : "♡"}</span>
+                </button>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="text-xs uppercase tracking-widest mb-1" style={{ color: "var(--mid)" }}>{p.cat}</div>
+                  <h3 className="display text-2xl mb-2">{p.name}</h3>
+                  <div className="flex items-center gap-2 mb-0">
+                    <Stars r={p.rating} />
+                    <span className="text-xs font-semibold">{p.rating}</span>
+                    <span className="text-xs" style={{ color: "var(--mid)" }}>({p.reviews})</span>
+                  </div>
+                </div>
+                <div className="flex items-end justify-between mt-4 pt-4" style={{ borderTop: "1px solid #eee" }}>
+                  <div>
+                    <div className="display text-3xl">{p.price.toLocaleString("ru-RU")} ₽</div>
+                    {p.oldPrice && <div className="text-xs line-through" style={{ color: "var(--mid)" }}>{p.oldPrice.toLocaleString("ru-RU")} ₽</div>}
+                  </div>
+                  <button
+                    onClick={() => buy(p.id)}
+                    className={cartItems.includes(p.id) ? "btn-outline py-2 px-5" : "btn-yellow py-2 px-5"}
+                  >
+                    {cartItems.includes(p.id) ? "✓ В КОРЗИНЕ" : "В КОРЗИНУ"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 4 normal */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-0"
+          style={{ borderLeft: "3px solid var(--ink)", borderRight: "3px solid var(--ink)", borderBottom: "3px solid var(--ink)" }}>
+          {PRODUCTS.slice(2).map((p, i) => (
+            <div
+              key={p.id}
+              className="geo-card"
+              style={{
+                borderRight: i < 3 ? "3px solid var(--ink)" : undefined,
+                borderTop: "3px solid var(--ink)",
+              }}
+            >
+              <div className="relative h-36 flex items-center justify-center" style={{ background: "#fafafa", borderBottom: "1px solid #eee" }}>
+                <span className="text-5xl">{p.emoji}</span>
+                <span className={`badge-geo absolute top-2.5 left-2.5 ${p.bColor}`}>{p.badge}</span>
+                <button onClick={() => heart(p.id)} className="absolute top-2 right-2 text-sm"
+                  style={{ color: wishlist.includes(p.id) ? "#FF5252" : "#ccc" }}>
+                  {wishlist.includes(p.id) ? "♥" : "♡"}
+                </button>
+              </div>
+              <div className="p-4">
+                <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--mid)" }}>{p.cat}</div>
+                <h3 className="display text-base mb-2 leading-tight">{p.name}</h3>
+                <Stars r={p.rating} />
+                <div className="flex items-end justify-between mt-3">
+                  <div>
+                    <div className="display text-xl">{p.price.toLocaleString("ru-RU")} ₽</div>
+                    {p.oldPrice && <div className="text-[10px] line-through" style={{ color: "var(--mid)" }}>{p.oldPrice.toLocaleString("ru-RU")} ₽</div>}
+                  </div>
+                  <button
+                    onClick={() => buy(p.id)}
+                    className={`text-[10px] px-3 py-2 font-bold uppercase tracking-wide transition-all ${cartItems.includes(p.id) ? "btn-outline" : "btn-yellow"}`}
+                  >
+                    {cartItems.includes(p.id) ? "✓" : "+ КУПИТЬ"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* ── ABOUT ── */}
-      <section id="about" className="relative z-10 py-14 px-6 section-mint">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-14 items-start">
-          <div>
-            <div className="tag-mint mb-5">О ПЛАТФОРМЕ</div>
-            <h2 className="text-3xl font-black tracking-tight mb-4" style={{ color: "var(--text)" }}>
-              Сделано с <span style={{ background: "linear-gradient(135deg,#FF7EB3,#FFB347)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>заботой</span>
+      <section id="about" className="max-w-7xl mx-auto px-6 pb-10">
+        <hr className="thick-rule mb-5" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0" style={{ border: "3px solid var(--ink)" }}>
+          <div className="block-ink p-10 md:p-12" style={{ borderRight: "3px solid var(--ink)" }}>
+            <div className="text-xs uppercase tracking-[0.2em] mb-5" style={{ color: "var(--mid)" }}>О ПЛАТФОРМЕ</div>
+            <h2 className="display text-5xl text-white mb-4">
+              ПОРЯДОК.<br />
+              <span style={{ color: "var(--yellow)" }}>СТРУКТУРА.</span><br />
+              СТИЛЬ.
             </h2>
-            <p className="text-sm leading-relaxed mb-8" style={{ color: "var(--muted-t)" }}>
-              «Всети-города» — маркетплейс для тех, кто ценит уют и качество. Только проверенные продавцы, честные отзывы и прозрачные цены.
+            <p className="text-sm leading-relaxed mb-8 text-white/60">
+              «Всети-города» — маркетплейс для тех, кто ценит порядок. Только проверенные продавцы, прозрачные цены, реальные отзывы.
             </p>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { icon: "Shield",     title: "Защита",        desc: "Гарантия возврата средств",  grad: "from-[#74C0FC] to-[#A8E6CF]" },
-                { icon: "Star",       title: "Честно",        desc: "Только реальные отзывы",     grad: "from-[#FFB347] to-[#FF7EB3]" },
-                { icon: "Truck",      title: "Быстро",        desc: "Доставка от 1 дня",          grad: "from-[#A8E6CF] to-[#C084FC]" },
-                { icon: "Headphones", title: "С заботой",     desc: "Поддержка 24/7",             grad: "from-[#C084FC] to-[#74C0FC]" },
+                { icon: "Shield",     title: "ЗАЩИТА",       col: "var(--yellow)" },
+                { icon: "Zap",        title: "СКОРОСТЬ",     col: "var(--teal)" },
+                { icon: "Truck",      title: "ДОСТАВКА",     col: "var(--coral)" },
+                { icon: "Star",       title: "ЧЕСТНО",       col: "var(--yellow)" },
               ].map((f, i) => (
-                <div key={i} className="float-card p-5 flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.grad} flex items-center justify-center shrink-0 shadow-sm`}>
-                    <Icon name={f.icon} size={17} className="text-white" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm" style={{ color: "var(--text)" }}>{f.title}</div>
-                    <div className="text-xs" style={{ color: "var(--muted-t)" }}>{f.desc}</div>
-                  </div>
+                <div key={i} className="flex items-center gap-3">
+                  <Icon name={f.icon} size={18} style={{ color: f.col }} />
+                  <span className="display text-sm text-white">{f.title}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="font-black text-4xl" style={{ color: "var(--text)" }}>4.8</span>
-              <div>
-                <div className="flex gap-0.5 text-xl">
-                  {[1,2,3,4,5].map(s => <span key={s} style={{ color: "#FFB347" }}>★</span>)}
-                </div>
-                <div className="text-xs" style={{ color: "var(--muted-t)" }}>1 200+ отзывов</div>
+          <div>
+            {/* Reviews */}
+            <div className="p-8 block-white" style={{ borderBottom: "3px solid var(--ink)" }}>
+              <div className="flex items-baseline gap-3 mb-5">
+                <span className="display text-5xl">4.8</span>
+                <span className="text-xl" style={{ color: "#FFD600" }}>★★★★★</span>
+                <span className="text-sm" style={{ color: "var(--mid)" }}>1 200+ отзывов</span>
               </div>
+              {[
+                { author: "Анна К.",     r: 5, text: "Заказала кроссовки — пришли быстро, качество отличное!", av: "АК" },
+                { author: "Максим В.",   r: 4, text: "Смартфон как на фото. Доставка 2 дня.",                 av: "МВ" },
+              ].map((rv, i) => (
+                <div key={i} className="flex gap-3 mb-4">
+                  <div className="w-9 h-9 block-ink flex items-center justify-center text-xs font-bold shrink-0 text-white">{rv.av}</div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="display text-sm">{rv.author}</span>
+                      <Stars r={rv.r} />
+                    </div>
+                    <p className="text-xs" style={{ color: "var(--mid)" }}>{rv.text}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            {[
-              { author: "Анна К.",     rating: 5, text: "Заказала диффузор — просто восторг! Аромат нежный, пришёл быстро.", date: "3 дня назад",  av: "АК" },
-              { author: "Максим В.",   rating: 4, text: "Кружку получил, очень качественная, цвет как на фото.", date: "1 нед. назад",  av: "МВ" },
-              { author: "Светлана Р.", rating: 5, text: "Лучший маркетплейс для покупок домой. Всё с заботой!", date: "2 нед. назад", av: "СР" },
-            ].map((r, i) => (
-              <div key={i} className="float-card p-5">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 bg-gradient-to-br ${["from-[#74C0FC] to-[#A8E6CF]","from-[#FFB347] to-[#FF7EB3]","from-[#C084FC] to-[#74C0FC]"][i]}`}>
-                    {r.av}
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-sm" style={{ color: "var(--text)" }}>{r.author}</div>
-                    <div className="text-[10px]" style={{ color: "var(--muted-t)" }}>{r.date}</div>
-                  </div>
-                  <Stars rating={r.rating} />
-                </div>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--muted-t)" }}>{r.text}</p>
-              </div>
-            ))}
-
             {/* CTA */}
-            <div className="float-card p-6 text-center" style={{ background: "linear-gradient(135deg,#e8f9f3,#e0f2fe)" }}>
-              <div className="text-3xl mb-2">🚀</div>
-              <div className="font-black text-xl mb-1" style={{ color: "var(--text)" }}>Стань продавцом</div>
-              <p className="text-xs mb-4" style={{ color: "var(--muted-t)" }}>Без абонентской платы — только комиссия с продаж</p>
-              <button className="btn-gradient w-full py-3 text-sm font-bold">Зарегистрироваться</button>
+            <div className="block-yellow p-8">
+              <div className="display text-3xl mb-2">СТАНЬ ПРОДАВЦОМ</div>
+              <p className="text-xs mb-5" style={{ color: "rgba(0,0,0,0.55)" }}>Без абонентской платы. Комиссия только с продаж.</p>
+              <button className="btn-ink w-full py-3.5">ЗАРЕГИСТРИРОВАТЬСЯ →</button>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── CONTACTS ── */}
-      <section id="contacts" className="relative z-10 py-14 px-6">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-black tracking-tight mb-8" style={{ color: "var(--text)" }}>Контакты</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { icon: "Phone",  title: "Телефон", value: "+7 (800) 555-35-35", sub: "Бесплатно по России", grad: "from-[#74C0FC] to-[#A8E6CF]" },
-              { icon: "Mail",   title: "Email",   value: "hello@vseti.ru",      sub: "Ответим за 2 часа",  grad: "from-[#FFB347] to-[#FF7EB3]" },
-              { icon: "MapPin", title: "Офис",    value: "Москва, Тверская, 1", sub: "Пн–Пт 9:00–18:00",  grad: "from-[#C084FC] to-[#74C0FC]" },
-            ].map((c, i) => (
-              <div key={i} className="float-card p-6">
-                <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${c.grad} flex items-center justify-center mb-4 shadow-md`}>
-                  <Icon name={c.icon} size={19} className="text-white" />
-                </div>
-                <div className="text-xs mb-1" style={{ color: "var(--muted-t)" }}>{c.title}</div>
-                <div className="font-black" style={{ color: "var(--text)" }}>{c.value}</div>
-                <div className="text-xs mt-1" style={{ color: "var(--muted-t)" }}>{c.sub}</div>
-              </div>
-            ))}
-          </div>
+      <section id="contacts" className="max-w-7xl mx-auto px-6 pb-10">
+        <hr className="thick-rule mb-5" />
+        <h2 className="display text-4xl mb-5">КОНТАКТЫ</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0" style={{ border: "3px solid var(--ink)" }}>
+          {[
+            { icon: "Phone",  title: "ТЕЛЕФОН", value: "+7 (800) 555-35-35", sub: "Бесплатно",   cls: "block-white" },
+            { icon: "Mail",   title: "EMAIL",   value: "hello@vseti.ru",      sub: "За 2 часа",   cls: "block-teal" },
+            { icon: "MapPin", title: "ОФИС",    value: "Москва, Тверская, 1", sub: "Пн–Пт 9–18", cls: "block-yellow" },
+          ].map((c, i) => (
+            <div key={i} className={`${c.cls} p-8`} style={{ borderRight: i < 2 ? "3px solid var(--ink)" : undefined }}>
+              <Icon name={c.icon} size={22} className="mb-4" />
+              <div className="display text-xs mb-1 opacity-60">{c.title}</div>
+              <div className="display text-xl mb-0.5">{c.value}</div>
+              <div className="text-xs opacity-60">{c.sub}</div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="relative z-10 py-8 px-6" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(10px)", borderTop: "1px solid rgba(116,192,252,0.15)" }}>
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="font-black text-lg" style={{ background: "linear-gradient(135deg,#4a9fd4,#2dba8a)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            Всети-города
-          </div>
-          <div className="text-xs" style={{ color: "var(--muted-t)" }}>© 2024 Всети-города. Сделано с ♡</div>
-          <div className="flex gap-5 text-xs" style={{ color: "var(--muted-t)" }}>
+      <footer className="block-ink" style={{ borderTop: "3px solid var(--ink)" }}>
+        <div className="max-w-7xl mx-auto px-6 py-7 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="display text-xl text-white tracking-tight">ВСЕТИ-ГОРОДА</div>
+          <div className="text-xs tracking-widest uppercase" style={{ color: "var(--mid)" }}>© 2024 ВСЕ ПРАВА ЗАЩИЩЕНЫ</div>
+          <div className="flex gap-6 text-xs uppercase tracking-widest" style={{ color: "var(--mid)" }}>
             {["Условия", "Конфиденциальность", "Помощь"].map(l => (
-              <button key={l} className="hover:underline transition-all">{l}</button>
+              <button key={l} className="hover:text-white transition-colors">{l}</button>
             ))}
           </div>
         </div>
@@ -499,81 +469,63 @@ export default function Index() {
       {/* ── CHATBOT ── */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
         {chatOpen && (
-          <div className="chat-bubble w-80 rounded-3xl overflow-hidden" style={{ boxShadow: "0 20px 60px rgba(116,192,252,0.25)", background: "#fff", border: "1px solid rgba(116,192,252,0.2)" }}>
-            <div className="flex items-center gap-3 px-4 py-3.5" style={{ background: "linear-gradient(135deg,#e8f9f3,#e0f2fe)", borderBottom: "1px solid rgba(116,192,252,0.15)" }}>
-              <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm" style={{ background: "linear-gradient(135deg,#74C0FC,#A8E6CF)" }}>
-                <Icon name="Bot" size={16} className="text-white" />
+          <div className="chat-in w-80 bg-white" style={{ border: "3px solid var(--ink)", boxShadow: "6px 6px 0 var(--yellow)" }}>
+            <div className="flex items-center gap-3 px-4 py-3 block-ink" style={{ borderBottom: "3px solid var(--ink)" }}>
+              <div className="w-8 h-8 block-yellow flex items-center justify-center">
+                <Icon name="Bot" size={15} className="text-black" />
               </div>
               <div>
-                <div className="text-sm font-bold" style={{ color: "var(--text)" }}>Помощник</div>
-                <div className="text-[10px]" style={{ color: "#2dba8a" }}>● онлайн</div>
+                <div className="display text-sm text-white">ПОМОЩНИК</div>
+                <div className="text-[10px] uppercase tracking-widest" style={{ color: "var(--teal)" }}>● ОНЛАЙН</div>
               </div>
-              <button onClick={() => setChatOpen(false)} className="ml-auto" style={{ color: "var(--muted-t)" }}>
-                <Icon name="X" size={16} />
+              <button onClick={() => setChatOpen(false)} className="ml-auto text-white/60 hover:text-white">
+                <Icon name="X" size={15} />
               </button>
             </div>
-
-            <div className="h-52 overflow-y-auto p-4 flex flex-col gap-2" style={{ background: "#fafcff" }}>
-              {chatMsgs.map((msg, i) => (
-                <div key={i} className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}>
+            <div className="h-52 overflow-y-auto p-4 flex flex-col gap-2 bg-[#fafafa]">
+              {msgs.map((m, i) => (
+                <div key={i} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className="text-xs px-3.5 py-2.5 rounded-2xl max-w-[80%] leading-relaxed"
+                    className="text-xs px-3 py-2 max-w-[80%] leading-relaxed"
                     style={
-                      msg.from === "user"
-                        ? { background: "linear-gradient(135deg,#74C0FC,#A8E6CF)", color: "#1a3a5c" }
-                        : { background: "#fff", border: "1px solid rgba(116,192,252,0.2)", color: "var(--text)" }
+                      m.from === "user"
+                        ? { background: "var(--ink)", color: "#fff" }
+                        : { background: "#fff", border: "2px solid var(--ink)", color: "var(--ink)" }
                     }
-                  >
-                    {msg.text}
-                  </div>
+                  >{m.text}</div>
                 </div>
               ))}
-              <div ref={chatEndRef} />
+              <div ref={endRef} />
             </div>
-
-            <div className="px-3 py-2 flex flex-wrap gap-1.5" style={{ borderTop: "1px solid rgba(116,192,252,0.12)", background: "#fff" }}>
-              {CHAT_TIPS.map(tip => (
+            <div className="px-3 py-2 flex flex-wrap gap-1.5 bg-white" style={{ borderTop: "2px solid #eee" }}>
+              {CHAT_TIPS.map(t => (
                 <button
-                  key={tip}
-                  onClick={() => sendMsg(tip)}
-                  className="text-[10px] px-2.5 py-1 rounded-full border font-medium transition-all"
-                  style={{ borderColor: "rgba(116,192,252,0.3)", color: "#4a9fd4" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(116,192,252,0.08)")}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                >
-                  {tip}
-                </button>
+                  key={t}
+                  onClick={() => send(t)}
+                  className="text-[10px] px-2.5 py-1 font-bold uppercase tracking-wider border-2 border-black hover:bg-yellow-400 transition-colors"
+                >{t}</button>
               ))}
             </div>
-
-            <div className="flex gap-2 p-3" style={{ borderTop: "1px solid rgba(116,192,252,0.12)", background: "#fff" }}>
+            <div className="flex gap-2 p-3 bg-white" style={{ borderTop: "2px solid #eee" }}>
               <input
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && chatInput.trim() && sendMsg(chatInput.trim())}
-                placeholder="Написать сообщение..."
-                className="flex-1 text-xs px-3.5 py-2 rounded-full focus:outline-none"
-                style={{ background: "#f0f8ff", border: "1.5px solid rgba(116,192,252,0.25)", color: "var(--text)" }}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && input.trim() && send(input.trim())}
+                placeholder="НАПИСАТЬ..."
+                className="flex-1 text-xs px-3 py-2 uppercase tracking-wider focus:outline-none border-2 border-black"
               />
-              <button
-                onClick={() => chatInput.trim() && sendMsg(chatInput.trim())}
-                className="btn-gradient w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-              >
-                <Icon name="Send" size={13} />
+              <button onClick={() => input.trim() && send(input.trim())} className="btn-ink px-3 py-2">
+                <Icon name="Send" size={13} className="text-white" />
               </button>
             </div>
           </div>
         )}
-
         <button
           onClick={() => setChatOpen(o => !o)}
-          className="w-14 h-14 rounded-full flex items-center justify-center transition-all hover:scale-105"
-          style={{
-            background: "linear-gradient(135deg, #74C0FC, #A8E6CF)",
-            boxShadow: "0 8px 28px rgba(116,192,252,0.45)",
-          }}
+          className="w-14 h-14 block-ink flex items-center justify-center transition-all hover:-translate-y-1"
+          style={{ border: "3px solid var(--ink)", boxShadow: "4px 4px 0 var(--yellow)" }}
         >
-          <Icon name={chatOpen ? "X" : "MessageCircle"} size={24} style={{ color: "#1a3a5c" }} />
+          <Icon name={chatOpen ? "X" : "MessageSquare"} size={22} className="text-white" />
         </button>
       </div>
     </div>
